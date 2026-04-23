@@ -15,7 +15,7 @@ int main()
     int Blue = 0;
     int coordinate_X = 0;
     int coordinate_Y = 0;
-
+    int filter = -67;
     string name_of_file= "test.jpg";
     string type;
     int size;
@@ -55,10 +55,74 @@ int main()
         Red = data[3 * (coordinate_Y * width + coordinate_X) + 0 + i];
         Green = data[3 * (coordinate_Y * width + coordinate_X) + 1 + i];
         Blue = data[3 * (coordinate_Y * width + coordinate_X) + 2 + i];
-        cout << Red<<" , ";
-        cout << Green<<" , ";
-        cout << Blue << endl;
+        if (filter == 1)
+        {
+            Red = Red / 3;
+            Green = Green / 3;
+            Blue = Blue / 3;
+        }
+        else if (filter == 2)
+        {
+            Red=255-Red; 
+            Green=255-Green; 
+            Blue=255-Blue;
+        }
+        else if(filter == 3)
+        {
+            Red = Red + 67;
+            Blue = Blue + 67;
+            Green = Green + 67;
+            // clamping is still required ++++++++++++++++++++++++++++++++++++++++++++
+        }
+        else if(filter == 4)
+        {
+            int min = Red , max = Red;
+            if ((Red >= Blue) && (Red >= Green))
+            {
+                max = Red;
+            }
+            else if ((Blue >= Red) && (Blue >= Green))
+            {
+                max = Blue;
+            }
+            else if ((Green >= Blue) && (Green >= Red))
+            {
+                max = Green;
+            }
+            
+            if ((Red <= Blue) && (Red <= Green))
+            {
+                min = Red;
+            }
+            else if ((Blue <= Red) && (Blue <= Green))
+            {
+                min = Blue;
+            }
+            else if ((Green <= Blue) && (Green <= Red))
+            {
+                min = Green;
+            }
+            Red = (Red - min) / (max - min) * 255;
+            Green = (Green - min) / (max - min) * 255;
+            Blue = (Blue - min) / (max - min) * 255;
+        }
+        else if (filter == 5)
+        {
+            Blue = 0;
+            Green = 0;
+        }
+        else if (filter == 6)
+        {
+            Red = 0;
+            Blue = 0;
+        }
+        else if (filter == 7)
+        {
+            Green = 0;
+            Red = 0;
+        }
+        
     }
-
+                                      
     stbi_image_free(data);
 }

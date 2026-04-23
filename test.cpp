@@ -16,11 +16,11 @@ int main()
     int coordinate_X = 0;
     int coordinate_Y = 0;
     int filter = -67;
-    string name_of_file = "Edited.jpg";
+    string name_of_file = "test.jpg";
     string type;
     int size;
     for (size = 0; name_of_file[size] != '\0'; size++)
-    {     
+    {
     }
     char *file_name = new char[size + 1];
     for (int i = 0; i < size; i++)
@@ -54,7 +54,63 @@ int main()
         delete[] file_name;
         return -1;
     }
-
+    
+    for (int i = 0; i < height; i++)
+    {
+        for (int j = 0; j < width; j++)
+        {
+            Red = data[3 * (j * width + i) + 0];
+            Green = data[3 * (j * width + i) + 1];
+            Blue = data[3 * (j * width + i) + 2];
+            int brightness = (Red + Green + Blue) / 3;
+            
+                
+                if (brightness <= 25)
+                {
+                    cout << " ";
+                }
+                else if ((brightness <= 56) && (brightness > 25))
+                {
+                    cout << ".";
+                }
+                else if ((brightness <= 84) && (brightness > 56))
+                {
+                    cout << ":";
+                }
+                else if ((brightness <= 112) && (brightness > 84))
+                {
+                    cout << "-";
+                }
+                else if ((brightness <= 140) && (brightness > 112))
+                {
+                    cout << "=";
+                }
+                else if ((brightness <= 168) && (brightness > 140))
+                {
+                    cout << "+";
+                }
+                else if ((brightness <= 196) && (brightness > 168))
+                {
+                    cout << "*";
+                }
+                else if ((brightness <= 224) && (brightness > 196))
+                {
+                    cout << "#";
+                }
+                else if ((brightness <= 255) && (brightness > 224))
+                {
+                    cout << "@";
+                }
+            
+           
+        }
+        if(i % 20 == 0)
+        {
+            cout << "\n";
+        }
+        
+    }
+cout<<"\n";
     cout << "Which filter do you want : ";
     cin >> filter;
     for (int i = 0; i < width; i++)
@@ -143,6 +199,64 @@ int main()
     {
         stbi_write_png("Edited.png", width, height, 3, data, width * 3);
     }
+    cout << " AFTER FILTER : \n \n \n";
+     
+    for (int i = 0; i < height; i++)
+    {
+        for (int j = 0; j < width; j++)
+        {
+            Red = data[3 * (j * width + i) + 0];
+            Green = data[3 * (j * width + i) + 1];
+            Blue = data[3 * (j * width + i) + 2];
+            int brightness = (Red + Green + Blue) / 3;
+            
+                
+                if (brightness <= 25)
+                {
+                    cout << " ";
+                }
+                else if ((brightness <= 56) && (brightness > 25))
+                {
+                    cout << ".";
+                }
+                else if ((brightness <= 84) && (brightness > 56))
+                {
+                    cout << ":";
+                }
+                else if ((brightness <= 112) && (brightness > 84))
+                {
+                    cout << "-";
+                }
+                else if ((brightness <= 140) && (brightness > 112))
+                {
+                    cout << "=";
+                }
+                else if ((brightness <= 168) && (brightness > 140))
+                {
+                    cout << "+";
+                }
+                else if ((brightness <= 196) && (brightness > 168))
+                {
+                    cout << "*";
+                }
+                else if ((brightness <= 224) && (brightness > 196))
+                {
+                    cout << "#";
+                }
+                else if ((brightness <= 255) && (brightness > 224))
+                {
+                    cout << "@";
+                }
+            
+            
+        }
+        if(i % 20 == 0)
+        {
+            cout << "\n";
+        }
+        
+    }
+cout<<"\n";
 
     stbi_image_free(data);
     delete[] file_name;

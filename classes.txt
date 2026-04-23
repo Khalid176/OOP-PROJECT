@@ -103,16 +103,17 @@ From saveavle and displayable ->
 Image :
 - height : int 
 - width : int 
+- file_name : string
 - Grid : Pixel ** 
 + Image(height : int, width : int )
 + Image()
 + ~Image()
 + getter_height() : int
 + getter_width() : int
-+ at( row : int , col : int ) : Pixel&
++ at( row : int , column : int ) : Pixel&
 + display_Ascii() : void
 + Image( Image & other )
-+ save() : bool
++ save(string outputPath) : bool
 ++++++++++++++++++++++++++++++
 friend class FilterSession   +
 ++++++++++++++++++++++++++++++

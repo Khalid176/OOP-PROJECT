@@ -1,86 +1,800 @@
 #include <iostream>
+#include <string>
+#define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image.h"
+#include "stb_image_write.h"
 using namespace std;
 class Pixel
 {
- int Red; 
- int Green ; 
- int Blue ; 
- public:
- Pixel( int Red , int Green , int Blue  )
- {
-    this->Red = Red;
-    this->Green = Green;
-    this->Blue = Blue;
- }
- Pixel ()
- {
-    Red = 0;
-    Green = 0;
-    Blue = 0;
- }
- int getter_Red()
- {
-    return Red;
- }
- int getter_Green()
- {
-    return Green;
- }
- int getter_Blue()
- {
-    return Blue;
- }
- void setter_Red(int Red )
- {
-    this->Red = Red;
- } 
- void setter_Green( int Green ) 
- {
-    this->Green = Green;
- }
- void setter_Blue( int Blue )
- {
-    this->Blue = Blue;
- }
-static int clamp_unity(int value );
-Pixel operator+(const Pixel &Pix)
-{
-    Pixel P;
-    P.Red = clamp_unity(this->Red + Pix.Red);
-    P.Blue = clamp_unity(this->Blue + Pix.Blue);
-    P.Green = clamp_unity(this->Green + Pix.Green);
+    int Red;
+    int Green;
+    int Blue;
 
-    return P;
+public:
+    Pixel(int Red, int Green, int Blue)
+    {
+        this->Red = Red;
+        this->Green = Green;
+        this->Blue = Blue;
+    }
+    Pixel()
+    {
+        Red = 0;
+        Green = 0;
+        Blue = 0;
+    }
+    int getter_Red()
+    {
+        return Red;
+    }
+    int getter_Green()
+    {
+        return Green;
+    }
+    int getter_Blue()
+    {
+        return Blue;
+    }
+    void setter_Red(int Red)
+    {
+        this->Red = Red;
+    }
+    void setter_Green(int Green)
+    {
+        this->Green = Green;
+    }
+    void setter_Blue(int Blue)
+    {
+        this->Blue = Blue;
+    }
+    static int clamp_unity(int value);
+    Pixel operator+(const Pixel &Pix)
+    {
+        Pixel P;
+        P.Red = clamp_unity(this->Red + Pix.Red);
+        P.Blue = clamp_unity(this->Blue + Pix.Blue);
+        P.Green = clamp_unity(this->Green + Pix.Green);
 
-}
-friend ostream& operator<<(ostream& out, const Pixel& p)
-{
-    out<<"Red : "<<p.Red<<" , ";
-    out<<"Blue : "<<p.Blue<<" , ";
-    out<<"Green : "<<p.Green;
-    return out;
-}
+        return P;
+    }
+    friend ostream &operator<<(ostream &out, const Pixel &p)
+    {
+        out << "Red : " << p.Red << " , ";
+        out << "Blue : " << p.Blue << " , ";
+        out << "Green : " << p.Green;
+        return out;
+    }
 };
 int Pixel::clamp_unity(int value)
 {
     if ((value <= 255) && (value >= 0))
     {
-       return value;
+        return value;
     }
-    else if(value > 255)
+    else if (value > 255)
     {
         return 255;
     }
-    else if(value < 0)
+    else if (value < 0)
     {
         return 0;
     }
 }
-class image
+
+class F_M_READ_WRITE; 
+
+class saveable
+{
+public:
+    bool virtual save(string outputPath, F_M_READ_WRITE &FM_RW) = 0;
+};
+
+class displayable
+{
+public:
+    void virtual display_Ascii() = 0;
+};
+
+class Image;
+
+class F_M_READ_WRITE
+{
+    int height;
+    int width;
+    int channels;
+    unsigned char *data = nullptr;
+    string type;
+
+public:
+    Image *F_M_READ_IMAGE(string name_of_file)
+    {
+
+        int size;
+        for (size = 0; name_of_file[size] != '\0'; size++)
+        {
+        }
+        char *file_name = new char[size + 1];
+        for (int i = 0; i < size; i++)
+        {
+
+            file_name[i] = name_of_file[i];
+        }
+
+        file_name[size] = '\0';
+        int counter = 0;
+        for (counter = 0; file_name[counter] != '.'; counter++)
+        {
+        }
+        if ((file_name[counter + 1] == 'j' && file_name[counter + 2] == 'p' && file_name[counter + 3] == 'g') && file_name[counter + 4] == '\0')
+        {
+            type = "jpg";
+        }
+        else if ((file_name[counter + 1] == 'p' && file_name[counter + 2] == 'n' && file_name[counter + 3] == 'g') && file_name[counter + 4] == '\0')
+        {
+            type = "png";
+        }
+        else
+        {
+            type = "INVALID ENTRY TRY AGAIN";
+        }
+        data = stbi_load(file_name, &width, &height, &channels, 3); // would assign pixel values on the unsigned char array
+        if (data == nullptr)
+        {
+            cout << "Failed to load image!" << endl;
+            delete[] file_name;
+            return nullptr;
+        }
+        Image *image = new Image(name_of_file, height, width);
+        for (int i = 0; i < width; i++)
+        {
+            for (int j = 0; j < height; j++)
+            {
+                int Red = data[3 * (j * width + i) + 0];
+                int Green = data[3 * (j * width + i) + 1];
+                int Blue = data[3 * (j * width + i) + 2];
+                image->GridGetter()[j][i].setter_Red(Red);
+                image->GridGetter()[j][i].setter_Green(Green);
+                image->GridGetter()[j][i].setter_Blue(Blue);
+            }
+        }
+        delete[] file_name;
+        return image;
+    }
+    bool F_M_WRITE_IMAGE(Image *image, string outputPath)
+    {
+        int size = 0;
+        for (size = 0; outputPath[size] != '\0'; size++)
+        {
+        }
+        char *file_path = new char[size + 7];
+        for (int i = 0, j = 0; i < size; i++)
+        {
+            file_path[j] = outputPath[i];
+
+            j++;
+
+            if (outputPath[i + 1] == '.')
+            {
+
+                file_path[j] = 'E';
+
+                j++;
+
+                file_path[j] = 'D';
+
+                j++;
+
+                file_path[j] = 'I';
+
+                j++;
+
+                file_path[j] = 'T';
+
+                j++;
+
+                file_path[j] = 'E';
+
+                j++;
+
+                file_path[j] = 'D';
+
+                j++;
+            }
+        }
+
+        file_path[size + 6] = '\0';
+        for (int i = 0; i < width; i++)
+        {
+            for (int j = 0; j < height; j++)
+            {
+                int index = 3 * (j * width + i);
+                data[index + 0] = image->GridGetter()[j][i].getter_Red();
+                data[index + 1] = image->GridGetter()[j][i].getter_Green();
+                data[index + 2] = image->GridGetter()[j][i].getter_Blue();
+            }
+        }
+
+        if (type == "jpg")
+        {
+            bool check = (stbi_write_jpg(file_path, width, height, 3, data, 100));
+            delete[] file_path;
+            return check;
+        }
+        else if (type == "png")
+        {
+            bool check = (stbi_write_png(file_path, width, height, 3, data, width * 3));
+            delete[] file_path;
+            return check;
+        }
+        else
+        {
+            delete[] file_path;
+            return false;
+        }
+    }
+
+    int F_M_READ_HEIGHT()
+    {
+        return height;
+    }
+    int F_M_READ_WIDTH()
+    {
+        return width;
+    }
+};
+class Image : public displayable, public saveable
+{
+    int height;
+    int width;
+    string file_name;
+    Pixel **Grid;
+
+public:
+    Image(string file_name, int height, int width)
+    {
+        this->file_name = file_name;
+        this->height = height;
+        this->width = width;
+        Grid = new Pixel *[height];
+        for (int i = 0; i < height; i++)
+        {
+            Grid[i] = new Pixel[width];
+        }
+        for (int i = 0; i < height; i++)
+        {
+            for (int j = 0; j < width; j++)
+            {
+                Grid[i][j] = Pixel(0, 0, 0);
+            }
+        }
+    }
+    Image()
+    {
+        file_name = "NO AVALIABLE";
+        height = 0;
+        width = 0;
+        Grid = nullptr;
+    }
+    int getter_height()
+    {
+        return height;
+    }
+    int getter_width()
+    {
+        return width;
+    }
+    void width_setter(int width)
+    {
+        this->width = width;
+    }
+    void height_setter(int height)
+    {
+        this->height = height;
+    }
+    Pixel &at(int row, int column)
+    {
+        return Grid[row][column];
+    }
+    Pixel **GridGetter()
+    {
+        return Grid;
+    }
+    void display_Ascii()
+    {
+        int counter = 0;
+        for (int j = 0; j < height; j++)
+        {
+
+            for (int i = 0; i < width; i++)
+            {
+                if (counter % 100 == 0)
+                {
+                    int brightness = ((Grid[j][i].getter_Red()) + (Grid[j][i].getter_Blue()) + (Grid[j][i].getter_Green())) / 3;
+
+                    if (brightness <= 25)
+                    {
+                        cout << " ";
+                    }
+                    else if ((brightness <= 56) && (brightness > 25))
+                    {
+                        cout << ".";
+                    }
+                    else if ((brightness <= 84) && (brightness > 56))
+                    {
+                        cout << ":";
+                    }
+                    else if ((brightness <= 112) && (brightness > 84))
+                    {
+                        cout << "-";
+                    }
+                    else if ((brightness <= 140) && (brightness > 112))
+                    {
+                        cout << "=";
+                    }
+                    else if ((brightness <= 168) && (brightness > 140))
+                    {
+                        cout << "+";
+                    }
+                    else if ((brightness <= 196) && (brightness > 168))
+                    {
+                        cout << "*";
+                    }
+                    else if ((brightness <= 224) && (brightness > 196))
+                    {
+                        cout << "#";
+                    }
+                    else if ((brightness <= 255) && (brightness > 224))
+                    {
+                        cout << "@";
+                    }
+                }
+                counter++;
+            }
+            cout << "\n";
+        }
+    }
+    Image(Image &other)
+    {
+        this->height = other.height;
+        this->width = other.width;
+
+        this->Grid = new Pixel *[this->height];
+        for (int i = 0; i < height; i++)
+        {
+            this->Grid[i] = new Pixel[this->width];
+        }
+
+        for (int i = 0; i < height; i++)
+        {
+            for (int j = 0; j < width; j++)
+            {
+                this->Grid[i][j] = other.Grid[i][j];
+            }
+        }
+    }
+    bool save(string outputPath, F_M_READ_WRITE &FM_RW)
+    {
+
+        bool check = 0;
+
+        check = FM_RW.F_M_WRITE_IMAGE(this, outputPath);
+        return check;
+    }
+    ~Image()
+    {
+        if (Grid != nullptr)
+        {
+            for (int i = 0; i < height; i++)
+            {
+                delete[] Grid[i];
+            }
+            delete[] Grid;
+            Grid = nullptr;
+        }
+    }
+};
+class Filter
+{
+public:
+    bool virtual apply(Image *image) = 0;
+    bool virtual is_avaliable() = 0;
+    virtual ~Filter() {}
+
+protected:
+    bool avaliable;
+};
+class GrayScale : public Filter
+{
+public:
+    bool apply(Image *image)
+    {
+        for (int i = 0; i < image->getter_width(); i++)
+        {
+            for (int j = 0; j < image->getter_height(); j++)
+            {
+                int Red = image->GridGetter()[j][i].getter_Red();
+                int Green = image->GridGetter()[j][i].getter_Green();
+                int Blue = image->GridGetter()[j][i].getter_Blue();
+
+                int average = (Red + Green + Blue) / 3;
+                Red = average;
+                Green = average;
+                Blue = average;
+                image->GridGetter()[j][i].setter_Red(Red);
+                image->GridGetter()[j][i].setter_Green(Green);
+                image->GridGetter()[j][i].setter_Blue(Blue);
+            }
+        }
+        return true;
+    }
+    bool is_avaliable()
+    {
+        return avaliable;
+    }
+};
+class Invert : public Filter
+{
+public:
+    bool apply(Image *image)
+    {
+        for (int i = 0; i < image->getter_width(); i++)
+        {
+            for (int j = 0; j < image->getter_height(); j++)
+            {
+                int Red = image->GridGetter()[j][i].getter_Red();
+                int Green = image->GridGetter()[j][i].getter_Green();
+                int Blue = image->GridGetter()[j][i].getter_Blue();
+
+                Red = image->GridGetter()[j][i].clamp_unity(255 - Red);
+                Green = image->GridGetter()[j][i].clamp_unity(255 - Green);
+                Blue = image->GridGetter()[j][i].clamp_unity(255 - Blue);
+
+                image->GridGetter()[j][i].setter_Red(Red);
+                image->GridGetter()[j][i].setter_Green(Green);
+                image->GridGetter()[j][i].setter_Blue(Blue);
+            }
+        }
+        return true;
+    }
+    bool is_avaliable()
+    {
+        return avaliable;
+    }
+};
+class Brightness_Adjust : public Filter
 {
 
-}
-int main() 
+    int increment = 67;
+
+public:
+    void increment_setter(int set)
+    {
+        increment = set;
+    }
+    bool apply(Image *image)
+    {
+        for (int i = 0; i < image->getter_width(); i++)
+        {
+            for (int j = 0; j < image->getter_height(); j++)
+            {
+                int Red = image->GridGetter()[j][i].getter_Red();
+                int Green = image->GridGetter()[j][i].getter_Green();
+                int Blue = image->GridGetter()[j][i].getter_Blue();
+
+                Red = image->GridGetter()[j][i].clamp_unity(Red + increment);
+                Green = image->GridGetter()[j][i].clamp_unity(Green + increment);
+                Blue = image->GridGetter()[j][i].clamp_unity(Blue + increment);
+
+                image->GridGetter()[j][i].setter_Red(Red);
+                image->GridGetter()[j][i].setter_Green(Green);
+                image->GridGetter()[j][i].setter_Blue(Blue);
+            }
+        }
+        return true;
+    }
+    bool is_avaliable()
+    {
+        return avaliable;
+    }
+};
+class Contrast_Stretch : public Filter
 {
-    
+public:
+    bool apply(Image *image)
+    {
+        for (int i = 0; i < image->getter_width(); i++)
+        {
+            for (int j = 0; j < image->getter_height(); j++)
+            {
+                int Red = image->GridGetter()[j][i].getter_Red();
+                int Green = image->GridGetter()[j][i].getter_Green();
+                int Blue = image->GridGetter()[j][i].getter_Blue();
+
+                int min = Red, max = Red;
+                if ((Red >= Blue) && (Red >= Green))
+                {
+                    max = Red;
+                }
+                else if ((Blue >= Red) && (Blue >= Green))
+                {
+                    max = Blue;
+                }
+                else if ((Green >= Blue) && (Green >= Red))
+                {
+                    max = Green;
+                }
+
+                if ((Red <= Blue) && (Red <= Green))
+                {
+                    min = Red;
+                }
+                else if ((Blue <= Red) && (Blue <= Green))
+                {
+                    min = Blue;
+                }
+                else if ((Green <= Blue) && (Green <= Red))
+                {
+                    min = Green;
+                }
+                if (max != min)
+                {
+
+                    Red = image->GridGetter()[j][i].clamp_unity((float)(Red - min) / (max - min) * 255);
+                    Green = image->GridGetter()[j][i].clamp_unity((float)(Green - min) / (max - min) * 255);
+                    Blue = image->GridGetter()[j][i].clamp_unity((float)(Blue - min) / (max - min) * 255);
+
+                    image->GridGetter()[j][i].setter_Red(Red);
+                    image->GridGetter()[j][i].setter_Green(Green);
+                    image->GridGetter()[j][i].setter_Blue(Blue);
+                }
+                else
+                {
+                    image->GridGetter()[j][i].setter_Red(Red);
+                    image->GridGetter()[j][i].setter_Green(Green);
+                    image->GridGetter()[j][i].setter_Blue(Blue);
+                }
+            }
+        }
+        return true;
+    }
+    bool is_avaliable()
+    {
+        return avaliable;
+    }
+};
+class Red_Channel_Only : public Filter
+{
+public:
+    bool apply(Image *image)
+    {
+        for (int i = 0; i < image->getter_width(); i++)
+        {
+            for (int j = 0; j < image->getter_height(); j++)
+            {
+                int Red = image->GridGetter()[j][i].getter_Red();
+                int Green = image->GridGetter()[j][i].getter_Green();
+                int Blue = image->GridGetter()[j][i].getter_Blue();
+
+                Green = 0;
+                Blue = 0;
+
+                image->GridGetter()[j][i].setter_Red(Red);
+                image->GridGetter()[j][i].setter_Green(Green);
+                image->GridGetter()[j][i].setter_Blue(Blue);
+            }
+        }
+        return true;
+    }
+    bool is_avaliable()
+    {
+        return avaliable;
+    }
+};
+class Green_Channel_Only : public Filter
+{
+public:
+    bool apply(Image *image)
+    {
+        for (int i = 0; i < image->getter_width(); i++)
+        {
+            for (int j = 0; j < image->getter_height(); j++)
+            {
+                int Red = image->GridGetter()[j][i].getter_Red();
+                int Green = image->GridGetter()[j][i].getter_Green();
+                int Blue = image->GridGetter()[j][i].getter_Blue();
+
+                Red = 0;
+                Blue = 0;
+
+                image->GridGetter()[j][i].setter_Red(Red);
+                image->GridGetter()[j][i].setter_Green(Green);
+                image->GridGetter()[j][i].setter_Blue(Blue);
+            }
+        }
+        return true;
+    }
+    bool is_avaliable()
+    {
+        return avaliable;
+    }
+};
+class Blue_Channel_Only : public Filter
+{
+public:
+    bool apply(Image *image)
+    {
+        for (int i = 0; i < image->getter_width(); i++)
+        {
+            for (int j = 0; j < image->getter_height(); j++)
+            {
+                int Red = image->GridGetter()[j][i].getter_Red();
+                int Green = image->GridGetter()[j][i].getter_Green();
+                int Blue = image->GridGetter()[j][i].getter_Blue();
+
+                Green = 0;
+                Red = 0;
+
+                image->GridGetter()[j][i].setter_Red(Red);
+                image->GridGetter()[j][i].setter_Green(Green);
+                image->GridGetter()[j][i].setter_Blue(Blue);
+            }
+        }
+        return true;
+    }
+    bool is_avaliable()
+    {
+        return avaliable;
+    }
+};
+class Box_Blur : public Filter
+{
+public:
+    bool apply(Image *IImage)
+    {
+        Image *image = new Image(*IImage);
+        int count = 1;
+        for (int i = 0; i < image->getter_height(); i++)
+        {
+            for (int j = 0; j < image->getter_width(); j++)
+            {
+                count = 1;
+                int Red = image->GridGetter()[i][j].getter_Red();
+                int Green = image->GridGetter()[i][j].getter_Green();
+                int Blue = image->GridGetter()[i][j].getter_Blue();
+                if (((i + 1) < image->getter_height()) && ((i + 1) >= 0))
+                {
+                    Red = Red + image->GridGetter()[i + 1][j].getter_Red();
+                    Blue = Blue + image->GridGetter()[i + 1][j].getter_Blue();
+                    Green = Green + image->GridGetter()[i + 1][j].getter_Green();
+                    count++;
+                }
+                if (((i - 1) < image->getter_height()) && ((i - 1) >= 0))
+                {
+                    Red = Red + image->GridGetter()[i - 1][j].getter_Red();
+                    Blue = Blue + image->GridGetter()[i - 1][j].getter_Blue();
+                    Green = Green + image->GridGetter()[i - 1][j].getter_Green();
+                    count++;
+                }
+                if (((j - 1) < image->getter_width()) && ((j - 1) >= 0))
+                {
+                    Red = Red + image->GridGetter()[i][j - 1].getter_Red();
+                    Blue = Blue + image->GridGetter()[i][j - 1].getter_Blue();
+                    Green = Green + image->GridGetter()[i][j - 1].getter_Green();
+                    count++;
+                }
+                if (((j + 1) < image->getter_width()) && ((j + 1) >= 0))
+                {
+                    Red = Red + image->GridGetter()[i][j + 1].getter_Red();
+                    Blue = Blue + image->GridGetter()[i][j + 1].getter_Blue();
+                    Green = Green + image->GridGetter()[i][j + 1].getter_Green();
+                    count++;
+                }
+                if ((((j + 1) < image->getter_width()) && ((j + 1) >= 0)) && (((i + 1) < image->getter_height()) && ((i + 1) >= 0)))
+                {
+                    Red = Red + image->GridGetter()[i + 1][j + 1].getter_Red();
+                    Blue = Blue + image->GridGetter()[i + 1][j + 1].getter_Blue();
+                    Green = Green + image->GridGetter()[i + 1][j + 1].getter_Green();
+                    count++;
+                }
+                if ((((j - 1) < image->getter_width()) && ((j - 1) >= 0)) && (((i - 1) < image->getter_height()) && ((i - 1) >= 0)))
+                {
+                    Red = Red + image->GridGetter()[i - 1][j - 1].getter_Red();
+                    Blue = Blue + image->GridGetter()[i - 1][j - 1].getter_Blue();
+                    Green = Green + image->GridGetter()[i - 1][j - 1].getter_Green();
+                    count++;
+                }
+                if ((((j + 1) < image->getter_width()) && ((j + 1) >= 0)) && (((i - 1) < image->getter_height()) && ((i - 1) >= 0)))
+                {
+                    Red = Red + image->GridGetter()[i - 1][j + 1].getter_Red();
+                    Blue = Blue + image->GridGetter()[i - 1][j + 1].getter_Blue();
+                    Green = Green + image->GridGetter()[i - 1][j + 1].getter_Green();
+                    count++;
+                }
+                if ((((j - 1) < image->getter_width()) && ((j - 1) >= 0)) && (((i + 1) < image->getter_height()) && ((i + 1) >= 0)))
+                {
+                    Red = Red + image->GridGetter()[i + 1][j - 1].getter_Red();
+                    Blue = Blue + image->GridGetter()[i + 1][j - 1].getter_Blue();
+                    Green = Green + image->GridGetter()[i + 1][j - 1].getter_Green();
+                    count++;
+                }
+
+                Red = IImage->GridGetter()[i][j].clamp_unity(Red / count);
+                Green = IImage->GridGetter()[i][j].clamp_unity(Green / count);
+                Blue = IImage->GridGetter()[i][j].clamp_unity(Blue / count);
+
+                IImage->GridGetter()[i][j].setter_Red(Red);
+                IImage->GridGetter()[i][j].setter_Green(Green);
+                IImage->GridGetter()[i][j].setter_Blue(Blue);
+            }
+        }
+
+        delete image;
+        return true;
+    }
+    bool is_avaliable()
+    {
+        return avaliable;
+    }
+};
+class Flip_Horizontal : public Filter
+{
+public:
+    bool apply(Image *image)
+    {
+        for (int i = 0; i < image->getter_height(); i++)
+        {
+            for (int j = 0; j < image->getter_width() / 2; j++)
+            {
+                int Red = image->GridGetter()[i][image->getter_width() - 1 - j].getter_Red();
+                int Green = image->GridGetter()[i][image->getter_width() - 1 - j].getter_Green();
+                int Blue = image->GridGetter()[i][image->getter_width() - 1 - j].getter_Blue();
+
+                image->GridGetter()[i][image->getter_width() - 1 - j].setter_Red(image->GridGetter()[i][j].getter_Red());
+                image->GridGetter()[i][image->getter_width() - 1 - j].setter_Green(image->GridGetter()[i][j].getter_Green());
+                image->GridGetter()[i][image->getter_width() - 1 - j].setter_Blue(image->GridGetter()[i][j].getter_Blue());
+
+                image->GridGetter()[i][j].setter_Red(Red);
+                image->GridGetter()[i][j].setter_Green(Green);
+                image->GridGetter()[i][j].setter_Blue(Blue);
+            }
+        }
+        return true;
+    }
+    bool is_avaliable()
+    {
+        return avaliable;
+    }
+};
+class Flip_Vertical : public Filter
+{
+public:
+    bool apply(Image *image)
+    {
+        for (int j = 0; j < image->getter_height() / 2; j++)
+        {
+            for (int i = 0; i < image->getter_width(); i++)
+            {
+                int Red = image->GridGetter()[image->getter_height() - 1 - j][i].getter_Red();
+                int Green = image->GridGetter()[image->getter_height() - 1 - j][i].getter_Green();
+                int Blue = image->GridGetter()[image->getter_height() - 1 - j][i].getter_Blue();
+
+                image->GridGetter()[image->getter_height() - 1 - j][i].setter_Red(image->GridGetter()[j][i].getter_Red());
+                image->GridGetter()[image->getter_height() - 1 - j][i].setter_Green(image->GridGetter()[j][i].getter_Green());
+                image->GridGetter()[image->getter_height() - 1 - j][i].setter_Blue(image->GridGetter()[j][i].getter_Blue());
+
+                image->GridGetter()[j][i].setter_Red(Red);
+                image->GridGetter()[j][i].setter_Green(Green);
+                image->GridGetter()[j][i].setter_Blue(Blue);
+            }
+        }
+        return true;
+    }
+    bool is_avaliable()
+    {
+        return avaliable;
+    }
+};
+int main()
+{
 }

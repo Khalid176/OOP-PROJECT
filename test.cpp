@@ -16,11 +16,11 @@ int main()
     int coordinate_X = 0;
     int coordinate_Y = 0;
     int filter = -67;
-    string name_of_file = "test.png";
+    string name_of_file = "Edited.jpg";
     string type;
     int size;
     for (size = 0; name_of_file[size] != '\0'; size++)
-    {
+    {     
     }
     char *file_name = new char[size + 1];
     for (int i = 0; i < size; i++)
@@ -48,14 +48,20 @@ int main()
         type = "INVALID ENTRY TRY AGAIN";
     }
     unsigned char *data = stbi_load(file_name, &width, &height, &channels, 3); // would assign pixel values on the unsigned char array
+    if (data == nullptr)
+    {
+        cout << "Failed to load image!" << endl;
+        delete[] file_name;
+        return -1;
+    }
 
     cout << "Which filter do you want : ";
     cin >> filter;
-    for (int i = 0; i < width;i++)
+    for (int i = 0; i < width; i++)
     {
         for (int j = 0; j < height; j++)
         {
-            Red = data[3 * (j * width + i) + 0];  
+            Red = data[3 * (j * width + i) + 0];
             Green = data[3 * (j * width + i) + 1];
             Blue = data[3 * (j * width + i) + 2];
             if (filter == 1)
@@ -140,5 +146,4 @@ int main()
 
     stbi_image_free(data);
     delete[] file_name;
-
 }

@@ -16,7 +16,7 @@ int main()
     int coordinate_X = 0;
     int coordinate_Y = 0;
     int filter = -67;
-    string name_of_file= "test.jpg";
+    string name_of_file = "test.png";
     string type;
     int size;
     for (size = 0; name_of_file[size] != '\0'; size++)
@@ -29,8 +29,8 @@ int main()
         file_name[i] = name_of_file[i];
     }
 
-    file_name[size + 1] = '\0';
-    cout<<file_name<<endl;
+    file_name[size] = '\0';
+    cout << file_name << endl;
     int counter = 0;
     for (counter = 0; file_name[counter] != '.'; counter++)
     {
@@ -48,81 +48,97 @@ int main()
         type = "INVALID ENTRY TRY AGAIN";
     }
     unsigned char *data = stbi_load(file_name, &width, &height, &channels, 3); // would assign pixel values on the unsigned char array
-    int coordinate_X_max = width * 3;
-    int coordinate_Y_max = height;
-    for (int i = 0; i < coordinate_X_max * coordinate_Y_max; i++, i++, i++)
+
+    cout << "Which filter do you want : ";
+    cin >> filter;
+    for (int i = 0; i < width;i++)
     {
-        Red = data[3 * (coordinate_Y * width + coordinate_X) + 0 + i];
-        Green = data[3 * (coordinate_Y * width + coordinate_X) + 1 + i];
-        Blue = data[3 * (coordinate_Y * width + coordinate_X) + 2 + i];
-        if (filter == 1)
+        for (int j = 0; j < height; j++)
         {
-            Red = Red / 3;
-            Green = Green / 3;
-            Blue = Blue / 3;
-        }
-        else if (filter == 2)
-        {
-            Red=255-Red; 
-            Green=255-Green; 
-            Blue=255-Blue;
-        }
-        else if(filter == 3)
-        {
-            Red = Red + 67;
-            Blue = Blue + 67;
-            Green = Green + 67;
-            // clamping is still required ++++++++++++++++++++++++++++++++++++++++++++
-        }
-        else if(filter == 4)
-        {
-            int min = Red , max = Red;
-            if ((Red >= Blue) && (Red >= Green))
+            Red = data[3 * (j * width + i) + 0];  
+            Green = data[3 * (j * width + i) + 1];
+            Blue = data[3 * (j * width + i) + 2];
+            if (filter == 1)
             {
-                max = Red;
+                Red = (Red + Green + Blue) / 3;
+                Green = (Red);
+                Blue = (Red);
             }
-            else if ((Blue >= Red) && (Blue >= Green))
+            else if (filter == 2)
             {
-                max = Blue;
+                Red = 255 - Red;
+                Green = 255 - Green;
+                Blue = 255 - Blue;
             }
-            else if ((Green >= Blue) && (Green >= Red))
+            else if (filter == 3)
             {
-                max = Green;
+                Red = Red + 67;
+                Blue = Blue + 67;
+                Green = Green + 67;
+                // clamping is still required ++++++++++++++++++++++++++++++++++++++++++++
             }
-            
-            if ((Red <= Blue) && (Red <= Green))
+            else if (filter == 4)
             {
-                min = Red;
+                int min = Red, max = Red;
+                if ((Red >= Blue) && (Red >= Green))
+                {
+                    max = Red;
+                }
+                else if ((Blue >= Red) && (Blue >= Green))
+                {
+                    max = Blue;
+                }
+                else if ((Green >= Blue) && (Green >= Red))
+                {
+                    max = Green;
+                }
+
+                if ((Red <= Blue) && (Red <= Green))
+                {
+                    min = Red;
+                }
+                else if ((Blue <= Red) && (Blue <= Green))
+                {
+                    min = Blue;
+                }
+                else if ((Green <= Blue) && (Green <= Red))
+                {
+                    min = Green;
+                }
+                Red = (float)(Red - min) / (max - min) * 255;
+                Green = (float)(Green - min) / (max - min) * 255;
+                Blue = (float)(Blue - min) / (max - min) * 255;
             }
-            else if ((Blue <= Red) && (Blue <= Green))
+            else if (filter == 5)
             {
-                min = Blue;
+                Blue = 0;
+                Green = 0;
             }
-            else if ((Green <= Blue) && (Green <= Red))
+            else if (filter == 6)
             {
-                min = Green;
+                Red = 0;
+                Blue = 0;
             }
-            Red = (Red - min) / (max - min) * 255;
-            Green = (Green - min) / (max - min) * 255;
-            Blue = (Blue - min) / (max - min) * 255;
+            else if (filter == 7)
+            {
+                Green = 0;
+                Red = 0;
+            }
+            data[3 * (j * width + i) + 0] = Red;
+            data[3 * (j * width + i) + 1] = Green;
+            data[3 * (j * width + i) + 2] = Blue;
         }
-        else if (filter == 5)
-        {
-            Blue = 0;
-            Green = 0;
-        }
-        else if (filter == 6)
-        {
-            Red = 0;
-            Blue = 0;
-        }
-        else if (filter == 7)
-        {
-            Green = 0;
-            Red = 0;
-        }
-        
     }
-                                      
+    if (type == "jpg")
+    {
+        stbi_write_jpg("Edited.jpg", width, height, 3, data, 100);
+    }
+    else if (type == "png")
+    {
+        stbi_write_png("Edited.png", width, height, 3, data, width * 3);
+    }
+
     stbi_image_free(data);
+    delete[] file_name;
+
 }

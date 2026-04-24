@@ -1,5 +1,7 @@
 #include <iostream>
 #include <string>
+#include <fstream>
+#include <vector>
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image.h"
@@ -82,7 +84,7 @@ int Pixel::clamp_unity(int value)
     }
 }
 
-class F_M_READ_WRITE; 
+class F_M_READ_WRITE; // Forward declaration of the class F_M_READ_WRITE to be used in the saveable interface
 
 class saveable
 {
@@ -96,7 +98,165 @@ public:
     void virtual display_Ascii() = 0;
 };
 
-class Image;
+class F_M_READ_WRITE; // Forward declaration of the class F_M_READ_WRITE to be used in the Image class
+class FilterSession;  // Forward declaration of the class FilterSession to be used in the Image class
+
+class Image : public displayable, public saveable
+{
+    int height;
+    int width;
+    string file_name;
+    Pixel **Grid;
+
+public:
+    bool save(string outputPath, F_M_READ_WRITE &FM_RW);
+    friend class FilterSession;
+    Image(string file_name, int height, int width)
+    {
+        this->file_name = file_name;
+        this->height = height;
+        this->width = width;
+        Grid = new Pixel *[height];
+        for (int i = 0; i < height; i++)
+        {
+            Grid[i] = new Pixel[width];
+        }
+        for (int i = 0; i < height; i++)
+        {
+            for (int j = 0; j < width; j++)
+            {
+                Grid[i][j] = Pixel(0, 0, 0);
+            }
+        }
+    }
+    Image()
+    {
+        file_name = "NO AVALIABLE";
+        height = 0;
+        width = 0;
+        Grid = nullptr;
+    }
+    int getter_height()
+    {
+        return height;
+    }
+    int getter_width()
+    {
+        return width;
+    }
+    void width_setter(int width)
+    {
+        this->width = width;
+    }
+    void height_setter(int height)
+    {
+        this->height = height;
+    }
+    Pixel &at(int row, int column)
+    {
+        return Grid[row][column];
+    }
+    Pixel **GridGetter()
+    {
+        return Grid;
+    }
+    void display_Ascii()
+    {
+        int rowStep = (height / 20) > 0 ? (height / 20) : 1;
+        int columnStep = (width / 40) > 0 ? (width / 40) : 1;
+        int counter = 0; // counter to keep track of the number of pixels printed in the current row
+        for (int j = 0; j < height; j++)
+        {
+            bool printedThisRow = 0;
+
+            for (int i = 0; i < width; i++)
+            {
+
+                int brightness = ((Grid[j][i].getter_Red()) + (Grid[j][i].getter_Blue()) + (Grid[j][i].getter_Green())) / 3;
+                if ((i % columnStep == 0) && (j % rowStep == 0))
+                {
+                    printedThisRow = true;
+                    if (brightness <= 25)
+                    {
+                        cout << " ";
+                    }
+                    else if ((brightness <= 56) && (brightness > 25))
+                    {
+                        cout << ".";
+                    }
+                    else if ((brightness <= 84) && (brightness > 56))
+                    {
+                        cout << ":";
+                    }
+                    else if ((brightness <= 112) && (brightness > 84))
+                    {
+                        cout << "-";
+                    }
+                    else if ((brightness <= 140) && (brightness > 112))
+                    {
+                        cout << "=";
+                    }
+                    else if ((brightness <= 168) && (brightness > 140))
+                    {
+                        cout << "+";
+                    }
+                    else if ((brightness <= 196) && (brightness > 168))
+                    {
+                        cout << "*";
+                    }
+                    else if ((brightness <= 224) && (brightness > 196))
+                    {
+                        cout << "#";
+                    }
+                    else if ((brightness <= 255) && (brightness > 224))
+                    {
+                        cout << "@";
+                    }
+                }
+                counter++;
+            }
+            // if ((width * height) % (j > 0 ? j : 1) == 0)
+            // {
+            //     cout << "\n";
+            // }
+            if ((j % rowStep == 0) && (printedThisRow))
+            {
+                cout << "\n";
+            }
+        }
+    }
+    Image(Image &other)
+    {
+        this->height = other.height;
+        this->width = other.width;
+
+        this->Grid = new Pixel *[this->height];
+        for (int i = 0; i < height; i++)
+        {
+            this->Grid[i] = new Pixel[this->width];
+        }
+
+        for (int i = 0; i < height; i++)
+        {
+            for (int j = 0; j < width; j++)
+            {
+                this->Grid[i][j] = other.Grid[i][j];
+            }
+        }
+    }
+    ~Image()
+    {
+        if (Grid != nullptr)
+        {
+            for (int i = 0; i < height; i++)
+            {
+                delete[] Grid[i];
+            }
+            delete[] Grid;
+            Grid = nullptr;
+        }
+    }
+};
 
 class F_M_READ_WRITE
 {
@@ -163,9 +323,30 @@ public:
     }
     bool F_M_WRITE_IMAGE(Image *image, string outputPath)
     {
+
         int size = 0;
+        int width = image->getter_width();
+        int height = image->getter_height();
+
+        unsigned char *output_data = new unsigned char[width * height * 3];
+
         for (size = 0; outputPath[size] != '\0'; size++)
         {
+        }
+        for (size = 0; outputPath[size] != '\0'; size++)
+        {
+        }
+        int counter = 0;
+        for (counter = 0; outputPath[counter] != '.'; counter++)
+        {
+        }
+        if ((outputPath[counter + 1] == 'j' && outputPath[counter + 2] == 'p' && outputPath[counter + 3] == 'g') && outputPath[counter + 4] == '\0')
+        {
+            type = "jpg";
+        }
+        else if ((outputPath[counter + 1] == 'p' && outputPath[counter + 2] == 'n' && outputPath[counter + 3] == 'g') && outputPath[counter + 4] == '\0')
+        {
+            type = "png";
         }
         char *file_path = new char[size + 7];
         for (int i = 0, j = 0; i < size; i++)
@@ -209,27 +390,29 @@ public:
             for (int j = 0; j < height; j++)
             {
                 int index = 3 * (j * width + i);
-                data[index + 0] = image->GridGetter()[j][i].getter_Red();
-                data[index + 1] = image->GridGetter()[j][i].getter_Green();
-                data[index + 2] = image->GridGetter()[j][i].getter_Blue();
+                output_data[index + 0] = image->GridGetter()[j][i].getter_Red();
+                output_data[index + 1] = image->GridGetter()[j][i].getter_Green();
+                output_data[index + 2] = image->GridGetter()[j][i].getter_Blue();
             }
         }
 
         if (type == "jpg")
         {
-            bool check = (stbi_write_jpg(file_path, width, height, 3, data, 100));
+            bool check = (stbi_write_jpg(file_path, width, height, 3, output_data, 100));
             delete[] file_path;
             return check;
         }
         else if (type == "png")
         {
-            bool check = (stbi_write_png(file_path, width, height, 3, data, width * 3));
+            bool check = (stbi_write_png(file_path, width, height, 3, output_data, width * 3));
             delete[] file_path;
+            delete[] output_data;
             return check;
         }
         else
         {
             delete[] file_path;
+            delete[] output_data;
             return false;
         }
     }
@@ -243,157 +426,16 @@ public:
         return width;
     }
 };
-class Image : public displayable, public saveable
+
+bool Image::save(string outputPath, F_M_READ_WRITE &FM_RW)
 {
-    int height;
-    int width;
-    string file_name;
-    Pixel **Grid;
 
-public:
-    Image(string file_name, int height, int width)
-    {
-        this->file_name = file_name;
-        this->height = height;
-        this->width = width;
-        Grid = new Pixel *[height];
-        for (int i = 0; i < height; i++)
-        {
-            Grid[i] = new Pixel[width];
-        }
-        for (int i = 0; i < height; i++)
-        {
-            for (int j = 0; j < width; j++)
-            {
-                Grid[i][j] = Pixel(0, 0, 0);
-            }
-        }
-    }
-    Image()
-    {
-        file_name = "NO AVALIABLE";
-        height = 0;
-        width = 0;
-        Grid = nullptr;
-    }
-    int getter_height()
-    {
-        return height;
-    }
-    int getter_width()
-    {
-        return width;
-    }
-    void width_setter(int width)
-    {
-        this->width = width;
-    }
-    void height_setter(int height)
-    {
-        this->height = height;
-    }
-    Pixel &at(int row, int column)
-    {
-        return Grid[row][column];
-    }
-    Pixel **GridGetter()
-    {
-        return Grid;
-    }
-    void display_Ascii()
-    {
-        int counter = 0;
-        for (int j = 0; j < height; j++)
-        {
+    bool check = 0;
 
-            for (int i = 0; i < width; i++)
-            {
-                if (counter % 100 == 0)
-                {
-                    int brightness = ((Grid[j][i].getter_Red()) + (Grid[j][i].getter_Blue()) + (Grid[j][i].getter_Green())) / 3;
+    check = FM_RW.F_M_WRITE_IMAGE(this, outputPath);
+    return check;
+}
 
-                    if (brightness <= 25)
-                    {
-                        cout << " ";
-                    }
-                    else if ((brightness <= 56) && (brightness > 25))
-                    {
-                        cout << ".";
-                    }
-                    else if ((brightness <= 84) && (brightness > 56))
-                    {
-                        cout << ":";
-                    }
-                    else if ((brightness <= 112) && (brightness > 84))
-                    {
-                        cout << "-";
-                    }
-                    else if ((brightness <= 140) && (brightness > 112))
-                    {
-                        cout << "=";
-                    }
-                    else if ((brightness <= 168) && (brightness > 140))
-                    {
-                        cout << "+";
-                    }
-                    else if ((brightness <= 196) && (brightness > 168))
-                    {
-                        cout << "*";
-                    }
-                    else if ((brightness <= 224) && (brightness > 196))
-                    {
-                        cout << "#";
-                    }
-                    else if ((brightness <= 255) && (brightness > 224))
-                    {
-                        cout << "@";
-                    }
-                }
-                counter++;
-            }
-            cout << "\n";
-        }
-    }
-    Image(Image &other)
-    {
-        this->height = other.height;
-        this->width = other.width;
-
-        this->Grid = new Pixel *[this->height];
-        for (int i = 0; i < height; i++)
-        {
-            this->Grid[i] = new Pixel[this->width];
-        }
-
-        for (int i = 0; i < height; i++)
-        {
-            for (int j = 0; j < width; j++)
-            {
-                this->Grid[i][j] = other.Grid[i][j];
-            }
-        }
-    }
-    bool save(string outputPath, F_M_READ_WRITE &FM_RW)
-    {
-
-        bool check = 0;
-
-        check = FM_RW.F_M_WRITE_IMAGE(this, outputPath);
-        return check;
-    }
-    ~Image()
-    {
-        if (Grid != nullptr)
-        {
-            for (int i = 0; i < height; i++)
-            {
-                delete[] Grid[i];
-            }
-            delete[] Grid;
-            Grid = nullptr;
-        }
-    }
-};
 class Filter
 {
 public:
@@ -793,6 +835,199 @@ public:
     bool is_avaliable()
     {
         return avaliable;
+    }
+};
+
+class FilterSession
+{
+    string customer_cnic;
+    string timestamp;
+    Image *image = nullptr;
+    vector<Filter *> filters;
+    int counter;
+
+public:
+    FilterSession(string customer_cnic, string timestamp, Image *image)
+    {
+        this->customer_cnic = customer_cnic;
+        this->timestamp = timestamp;
+        this->image = image;
+        counter = 0;
+    }
+    bool add_filter(Filter *filter)
+    {
+        filters.push_back(filter);
+        counter++;
+    }
+    bool apply_pipeline()
+    {
+        for (int i = 0; i < counter; i++)
+        {
+            if (filters.at(i)->is_avaliable())
+            {
+                filters.at(i)->apply(image);
+            }
+        }
+    }
+    bool save_result(string output_path)
+    {
+        F_M_READ_WRITE fm_R_W;
+        return (image->save(output_path, fm_R_W));
+    }
+    void display_ascii_preview()
+    {
+        image->display_Ascii();
+    }
+    ~FilterSession()
+    {
+    }
+};
+class user
+{
+protected:
+    string name;
+    string cnic;
+    string phone;
+    string city;
+    string Gender;
+    string password;
+
+public:
+    bool virtual login(string cnic, string password) = 0;
+};
+class Customer : public user
+{
+
+    bool is_blocked;
+
+public:
+    Customer(string name, string phone, string city, string password, string gender, string cnic)
+    {
+        this->name = name;
+        this->phone = phone;
+        this->cnic = cnic;
+        this->Gender = gender;
+        this->city = city;
+        this->password = password;
+        
+        ofstream file("Customers.txt", ios::app);
+        if (!file.is_open())
+        {
+            cout << "UNABLE TO OPEN THE FILE " << endl;
+        }
+        else
+        {
+            file << cnic << "|" << password << "|" << name << "|" << Gender << "|" << phone << "|" << city << 0<<endl;
+        }
+        file.close();
+    }
+
+    bool login(string cnic, string password)
+    {
+        int cnic_size;
+        int password_size;
+
+        for (password_size = 0; password[password_size] != '\0'; password_size++)
+        {
+        }
+        for (cnic_size = 0; cnic[cnic_size] != '\0'; cnic_size++)
+        {
+        }
+
+        ifstream file("Customers.txt"); 
+        if (!file.is_open())
+        {
+            cout << "Error: Could not open the file!" << endl;  
+            return 0;
+        }
+        string data;
+        while (getline(file, data))
+        {
+            string picked_password;
+            string picked_cnic;
+            string picked_name;
+            string picked_gender;
+            string picked_phone;
+            string picked_city;
+            bool picked_is_blocked;
+
+            int i = 0;
+            for (i = 0; data[i] != '|'; i++)
+            {
+                picked_cnic += data[i];
+            }
+
+            i++;
+            for (; data[i] != '|'; i++)
+            {
+                picked_password += data[i];
+            }
+
+            i++;
+            int picked_password_size = picked_password.length();
+            int picked_cnic_size = picked_cnic.length();
+
+            if (picked_cnic_size != cnic_size || picked_password_size != password_size)
+            {
+                continue;
+            }
+            else
+            {
+                if ((picked_password == password) && (picked_cnic == cnic))
+                {
+                    for (; data[i] != '|'; i++)
+                    {
+                        picked_name += data[i];
+                    }
+
+                    i++;
+                    for (; data[i] != '|'; i++)
+                    {
+                        picked_gender += data[i];
+                    }
+
+                    i++;
+                    for (; data[i] != '|'; i++)
+                    {
+                        picked_phone += data[i];
+                    }
+
+                    i++;
+                    for (; data[i] != '|'; i++)
+                    {
+                        picked_city += data[i];
+                    }
+
+                    i++;
+                    for (; data[i] != '\0'; i++)
+                    {
+                        picked_is_blocked = (data[i] == '1');
+                    }
+                    name = picked_name;
+                    phone = picked_phone;
+                    Gender = picked_gender;
+                    city = picked_city;
+                    is_blocked = picked_is_blocked;
+                    if (is_blocked != 1)
+                    {
+                        file.close();
+                        return 1;
+                    }
+                    else
+                    {
+                        cout << "User has been blocked by the admin \n ";
+                        file.close();
+                        return 0;
+                    }
+                }
+            }
+        }
+        file.close();
+        return 0;
+    }
+    bool is_blocked_getter()
+    {
+        return is_blocked;
     }
 };
 int main()

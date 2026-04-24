@@ -9,7 +9,7 @@ Abstract user :
 
 
 From user -> 
-Admin : 
+Admin :
 + login( cnic : string,  password : string) : bool
 + toggle_block( cnic:string) : bool
 + toggle_filter( filterID:int) : bool
@@ -114,18 +114,20 @@ Image :
 + display_Ascii() : void
 + Image( Image & other )
 + save(string outputPath) : bool
+
+
 ++++++++++++++++++++++++++++++
-friend class FilterSession   +
+friend class FilterSession   + NO LONGER NEEDED
 ++++++++++++++++++++++++++++++
 
 
 F_M Costomers : 
-+ F_M LOAD( filename : string) : Customer*
++ F_M LOAD( filename : string , customer : Customer *) : Customer*
 + F_M LOAD_Counter( filename : string) : int
 + F_M SAVE( filename : string,  customer : Customer*) : bool
 + F_M DELETE( filename : string,  cnic : string) : bool
 + F_M TOGGLE_BLOCK( filename : string,  cnic : string) : bool
-+ F_M SEARCH( filename : string,  cnic : string)  : Customer*
++ F_M SEARCH( filename : string,  cnic : string , customer : Customer *)  : Customer*
 
 F_M FILTER_CATALOG :
 + F_M LOAD(filename : string ) : vector<Filter*>
@@ -147,12 +149,14 @@ FilterSession :
 
 - customer_cnic : string
 - timestamp : string
-- original_image : Image*
-- modified_image : Image*
+- image : Image*
 - filters : vector<Filter*>
+- counter : int
++ FilterSession( customer_cnic : string, timestamp : string, original_image : Image* )
 + add_filter(filter : Filter*) : bool
-+ build_pipeline() : bool
 + apply_pipeline() : bool
-+ save_result(outputPath : string) : bool
-+ record_session() : bool
-+ display_ascii_preview(image : Image*) : void
++ save_result(output_name : string) : bool
++ build_pipeline() : bool -----------------------------------------------------------------------
++ record_session() : bool -----------------------------------------------------------------------
++ display_ascii_preview() : void
++ ~ FilterSession()

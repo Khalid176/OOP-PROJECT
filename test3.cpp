@@ -145,8 +145,8 @@ bool F_M_Delete(string cnic)
     //     }
 
     ifstream file_real2("Sessions.txt");
-    // ofstream file_temp2("Temp2.txt");
-    if (!(file_real2.is_open() /*&& file_temp2.is_open()*/))
+    ofstream file_temp2("Temp2.txt");
+    if (!(file_real2.is_open() && file_temp2.is_open()))
     {
         cout << "UNABLE TO OpEN THE FILE " << endl;
         return 0;
@@ -154,7 +154,7 @@ bool F_M_Delete(string cnic)
     else
     {
         string data2;
-        if (!(file_real2.is_open() /*&& file_temp2.is_open()*/))
+        if (!(file_real2.is_open() && file_temp2.is_open()))
         {
             return 0;
         }
@@ -169,7 +169,7 @@ bool F_M_Delete(string cnic)
                     picked_cnic = picked_cnic + data2[i];
                 }
                 i++;
-                if (picked_cnic == cnic)
+                if (picked_cnic != cnic)
                 {
                     for (; data2[i] != '|'; i++)
                     {
@@ -190,37 +190,36 @@ bool F_M_Delete(string cnic)
 
                     i++;
 
-                    cout << picked_cnic << "|" << picked_Timestamp << "|" << picked_FiltersAplied << "|" << picked_OutputFile << endl;
+                    file_temp2 << picked_cnic << "|" << picked_Timestamp << "|" << picked_FiltersAplied << "|" << picked_OutputFile << endl;
                 }
             }
 
             file_real2.close();
+            file_temp2.close();
+            ofstream file_real2("Sessions.txt");
+            ifstream file_temp2("Temp2.txt");
+
+            if (!(file_real2.is_open() && file_temp2.is_open()))
+            {
+                cout << "UNABLE TO OPEN THE FILE last" << endl;
+                return 0;
+            }
+            else
+            {
+                while (getline(file_temp2, data2))
+                {
+                    file_real2 << data2 << endl;
+                }
+            }
+
+            file_real2.close();
+            file_temp2.close();
             return 1;
-            // file_temp2.close();
-            // ofstream file_real2("Sessions.txt");
-            // ifstream file_temp2("Temp2.txt");
-
-            // if (!(file_real2.is_open() /*&& file_temp2.is_open()*/))
-            // {
-            //     cout << "UNABLE TO OPEN THE FILE last" << endl;
-            //     return 0;
-            // }
-            // else
-            // {
-            //     while (getline(file_temp2, data2))
-            //     {
-            //         file_real2 << data2 << endl;
-            //     }
-            // }
-
-            // file_real2.close();
-            // file_temp2.close();
-            // return 1;
         }
     }
 }
 
 int main()
 {
-    F_M_Delete("33");
+    F_M_Delete("123");
 }

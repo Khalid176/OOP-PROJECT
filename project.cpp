@@ -1286,7 +1286,6 @@ public:
                     {
                         while (getline(file_temp2, data2))
                         {
-                            cout << "Copying";
                             file_real2 << data2 << endl;
                         }
                     }
@@ -1297,6 +1296,10 @@ public:
                 }
             }
         }
+    }
+    bool F_M_Toogle(string cnic)
+    {
+        
     }
 };
 bool Customer::login(string e_cnic, string e_password, Customer *customer)

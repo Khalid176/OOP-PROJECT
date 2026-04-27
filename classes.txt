@@ -1,0 +1,162 @@
+Abstract user :
+# name : string 
+# cnic : string
+# phone : string
+# city : string
+# gender : string
+# password : string
++ login( cnic : string ,  password : string) = 0 : bool
+
+
+From user -> 
+Admin :
++ login( cnic : string,  password : string) : bool
++ toggle_block( cnic:string) : bool
++ toggle_filter( filterID:int) : bool
++ delete_account( cnic:string) : bool
++ view_sessions_All( filepath:string) : void 
++ view_sessions_single_user( filepath : string, cnic : string ) : void
++ Display_blocked( filepath : string ) : void
+
+Customer:
+- is_blocked : bool
++ Customer( name : string,  cnic : string,  phone : string,  city : string,  gender : string,  password : string) 
++ Is_blocked() : bool
++ login( cnic : string ,  password : string) : bool
++ display_history() : void
+
+
+============================================================================================
+
+
+Abstract filter:
+# available : bool
++ apply( image : Image* ) = 0: bool
++ is_available() = 0: bool
+
+From filter ->
+Grayscale :
++ apply(image : Image*) : bool
++ is_available() : bool
+
+Invert :
++ apply(image : Image*) : bool
++ is_available() : bool
+
+Brightness_Adjust :
++ apply(image : Image*) : bool
++ is_available() : bool
+
+Contrast_Stretch :
++ apply(image : Image*) : bool
++ is_available() : bool
+
+Red_Channel_Only:
++ apply(image : Image*) : bool
++ is_available() : bool
+
+Green_Channel_Only:
++ apply(image : Image*) : bool
++ is_available() : bool
+
+Blue_Channel_Only:
++ apply(image : Image*) : bool
++ is_available() : bool
+
+Box_Blur (3×3) :
++ apply(image : Image*) : bool
++ is_available() : bool
+
+Flip_Horizontal :
++ apply(image : Image*) : bool
++ is_available() : bool
+
+Flip_Vertical :
++ apply(image : Image*) : bool
++ is_available() : bool
+
+
+Pixel :
+- Red : int
+- Green : int
+- Blue : int
++ Pixel( R : int, G : int, B : int )
++ Pixel () 
++ getter_Red() : int
++ getter_Green() : int
++ getter_Blue() : int
++ setter_Red( R : int ) : void
++ setter_Green( G : int ) : void
++ setter_Blue( B : int ) : void
++ static  clamp_unity(value : int ) : int
++ Operator + (Pixel : Pixel) : Pixel
++ Operator<<(out : ostream&, p : Pixel) : ostream&
+
+
+saveable :
++ save() = 0 : bool
+
+displayable :
++ display_Ascii() = 0 : void
+
+From saveavle and displayable ->
+Image :
+- height : int 
+- width : int 
+- file_name : string
+- Grid : Pixel ** 
++ Image(height : int, width : int )
++ Image()
++ ~Image()
++ getter_height() : int
++ getter_width() : int
++ at( row : int , column : int ) : Pixel&
++ display_Ascii() : void
++ Image( Image & other )
++ save(string outputPath) : bool
+
+
+++++++++++++++++++++++++++++++
+friend class FilterSession   + NO LONGER NEEDED
+++++++++++++++++++++++++++++++
+
+
+F_M Costomers : 
++ F_M_LOAD( filename : string , customer : Customer *) : Customer*
++ F_M LOAD_Counter( filename : string) : int
++ F_M SAVE( filename : string,  customer : Customer*) : bool
++ F_M DELETE( filename : string,  cnic : string) : bool
++ F_M TOGGLE_BLOCK( filename : string,  cnic : string) : bool
++ F_M SEARCH( filename : string,  cnic : string , customer : Customer *)  : Customer*
+
+F_M FILTER_CATALOG :
++ F_M LOAD(filename : string ) : vector<Filter*>
++ F_M SAVE(filename : string, filters :  vector<Filter*>) : bool
++ F_M TOGGLE_AVAILABILITY( filename : string, filterID : int ) : bool
+
+F_M SESSIONS :
++ F_M LOAD_FOR_SPECIFIC_USER(cnic : string ) : void
++ F_M APPEND_SESSION( cnic : string , timestamp : string , filter_name : string , image_name : string ) : bool
++ F_M DELETE_SESSIONS_FOR_SPECIFIC_USER( cnic : string) : bool
+
+F_M READ_WRITE :
++ F_M WRITE_IMAGE(image : Image*, outputPath : string) : bool
++ F_M READ_IMAGE(filepath : string) : Image*
++ F_M READ_HEIGHT(filepath : string) : int   
++ F_M READ_WIDTH(filepath : string) : int
+
+FilterSession :
+
+- customer_cnic : string
+- timestamp : string
+- image : Image*
+- filters : vector<Filter*>
+- counter : int
++ FilterSession( customer_cnic : string, timestamp : string, original_image : Image* )
++ add_filter(filter : Filter*) : bool
++ apply_pipeline() : bool
++ save_result(output_name : string) : bool
++ build_pipeline() : bool -----------------------------------------------------------------------
++ record_session() : bool -----------------------------------------------------------------------
++ display_ascii_preview() : void
++ ~ FilterSession()

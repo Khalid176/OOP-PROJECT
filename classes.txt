@@ -122,7 +122,7 @@ friend class FilterSession   + NO LONGER NEEDED
 
 
 F_M Costomers : 
-+ F_M LOAD( filename : string , customer : Customer *) : Customer*
++ F_M_LOAD( filename : string , customer : Customer *) : Customer*
 + F_M LOAD_Counter( filename : string) : int
 + F_M SAVE( filename : string,  customer : Customer*) : bool
 + F_M DELETE( filename : string,  cnic : string) : bool

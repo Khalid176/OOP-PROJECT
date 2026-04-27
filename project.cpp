@@ -400,6 +400,7 @@ public:
         {
             bool check = (stbi_write_jpg(file_path, width, height, 3, output_data, 100));
             delete[] file_path;
+            delete[] output_data;
             return check;
         }
         else if (type == "png")
@@ -858,20 +859,31 @@ public:
     {
         filters.push_back(filter);
         counter++;
+        return true;
     }
     bool apply_pipeline()
     {
+        int counter2 = 0;
         for (int i = 0; i < counter; i++)
         {
             if (filters.at(i)->is_avaliable())
             {
-                filters.at(i)->apply(image);
+                if (filters.at(i)->apply(image))
+                {
+                    counter2++;
+                }
+                else
+                {
+                    cout << "An error has occoured";
+                    return false;
+                }
             }
         }
+
+        return true;
     }
-    bool save_result(string output_path)
+    bool save_result(string output_path, F_M_READ_WRITE &fm_R_W)
     {
-        F_M_READ_WRITE fm_R_W;
         return (image->save(output_path, fm_R_W));
     }
     void display_ascii_preview()
@@ -880,10 +892,15 @@ public:
     }
     ~FilterSession()
     {
+        delete image;
+        filters.clear();
     }
 };
+class F_M_Customers;
 class user
 {
+    friend class F_M_Customers;
+
 protected:
     string name;
     string cnic;
@@ -893,36 +910,42 @@ protected:
     string password;
 
 public:
-    bool virtual login(string cnic, string password) = 0;
+    bool virtual login(string cnic, string password, Customer *customer) = 0;
 };
+
+// Customer strting ====================================
+
 class Customer : public user
 {
 
     bool is_blocked;
 
 public:
-    Customer(string name, string phone, string city, string password, string gender, string cnic)
+    friend class F_M_Customers;
+    Customer(string name, string phone, string city, string password, string Gender, string cnic)
     {
         this->name = name;
         this->phone = phone;
         this->cnic = cnic;
-        this->Gender = gender;
+        this->Gender = Gender;
         this->city = city;
         this->password = password;
-        
-        ofstream file("Customers.txt", ios::app);
-        if (!file.is_open())
-        {
-            cout << "UNABLE TO OPEN THE FILE " << endl;
-        }
-        else
-        {
-            file << cnic << "|" << password << "|" << name << "|" << Gender << "|" << phone << "|" << city << 0<<endl;
-        }
-        file.close();
+        is_blocked = false;
     }
-
-    bool login(string cnic, string password)
+    bool is_blocked_getter()
+    {
+        return is_blocked;
+    }
+    bool login(string e_cnic, string e_password, Customer *customer); // forward declaration
+    bool display_history()
+    {
+        //  would be done in F_M_Sessions
+    }
+};
+class F_M_Customers
+{
+public:
+    Customer *F_M_Load(string filemane, Customer *customer, string cnic, string password)
     {
         int cnic_size;
         int password_size;
@@ -934,102 +957,216 @@ public:
         {
         }
 
-        ifstream file("Customers.txt"); 
+        ifstream file("Customers.txt");
         if (!file.is_open())
         {
-            cout << "Error: Could not open the file!" << endl;  
+            cout << "Error: Could not open the file!" << endl;
             return 0;
         }
         string data;
         while (getline(file, data))
         {
-            string picked_password;
-            string picked_cnic;
-            string picked_name;
-            string picked_gender;
-            string picked_phone;
-            string picked_city;
-            bool picked_is_blocked;
+            string Picked_password;
+            string Picked_cnic;
+            string Picked_name;
+            string Picked_Gender;
+            string Picked_phone;
+            string Picked_city;
+            bool Picked_is_blocked;
 
             int i = 0;
             for (i = 0; data[i] != '|'; i++)
             {
-                picked_cnic += data[i];
+                Picked_cnic += data[i];
             }
 
             i++;
             for (; data[i] != '|'; i++)
             {
-                picked_password += data[i];
+                Picked_password += data[i];
             }
 
             i++;
-            int picked_password_size = picked_password.length();
-            int picked_cnic_size = picked_cnic.length();
+            int Picked_password_size = Picked_password.length();
+            int Picked_cnic_size = Picked_cnic.length();
 
-            if (picked_cnic_size != cnic_size || picked_password_size != password_size)
+            if (Picked_cnic_size != cnic_size || Picked_password_size != password_size)
             {
                 continue;
             }
             else
             {
-                if ((picked_password == password) && (picked_cnic == cnic))
+                if ((Picked_password == password) && (Picked_cnic == cnic))
                 {
                     for (; data[i] != '|'; i++)
                     {
-                        picked_name += data[i];
+                        Picked_name += data[i];
                     }
 
                     i++;
                     for (; data[i] != '|'; i++)
                     {
-                        picked_gender += data[i];
+                        Picked_Gender += data[i];
                     }
 
                     i++;
                     for (; data[i] != '|'; i++)
                     {
-                        picked_phone += data[i];
+                        Picked_phone += data[i];
                     }
 
                     i++;
                     for (; data[i] != '|'; i++)
                     {
-                        picked_city += data[i];
+                        Picked_city += data[i];
                     }
 
                     i++;
                     for (; data[i] != '\0'; i++)
                     {
-                        picked_is_blocked = (data[i] == '1');
+                        Picked_is_blocked = (data[i] == '1');
                     }
-                    name = picked_name;
-                    phone = picked_phone;
-                    Gender = picked_gender;
-                    city = picked_city;
-                    is_blocked = picked_is_blocked;
-                    if (is_blocked != 1)
+                    customer->name = Picked_name;
+                    customer->phone = Picked_phone;
+                    customer->Gender = Picked_Gender;
+                    customer->city = Picked_city;
+                    customer->is_blocked = Picked_is_blocked;
+                    if (customer->is_blocked != 1)
                     {
                         file.close();
-                        return 1;
                     }
                     else
                     {
                         cout << "User has been blocked by the admin \n ";
                         file.close();
-                        return 0;
                     }
                 }
             }
         }
         file.close();
-        return 0;
+        return customer;
     }
-    bool is_blocked_getter()
+    bool F_M_Save(Customer *customer)
     {
-        return is_blocked;
+        ofstream file("Customers.txt", ios::app);
+        if (!file.is_open())
+        {
+            cout << "UNABLE TO OPEN THE FILE " << endl;
+        }
+        else
+        {
+            file << customer->cnic << "|" << customer->password << "|" << customer->name << "|" << customer->Gender << "|" << customer->phone << "|" << customer->city << "|" << 0 << endl;
+        }
+        file.close();
+    }
+
+    int F_M_Customer_Counter()
+    {
+        ifstream file("Customers.txt");
+        if (!file.is_open())
+        {
+            cout << "UNABLE TO OPEN THE FILE " << endl;
+        }
+        else
+        {
+            int counter = 0;
+            string line;
+            while (getline(file, line))
+            {
+                counter++;
+            }
+            file.close();
+            return counter;
+        }
+    }
+    bool F_M_Delete(string cnic)
+    {
+        int count = F_M_Customer_Counter();
+        ifstream file_real("Customers.txt");
+        ofstream file_temp("Temp.txt");
+        if (!(file_real.is_open() && file_temp.is_open()))
+        {
+            cout << "UNABLE TO OPEN THE FILE " << endl;
+            return 0;
+        }
+        else
+        {
+            string data;
+
+            while (getline(file_real, data))
+            {
+                int i = 0;
+
+                string Picked_password;
+                string Picked_cnic;
+                string Picked_name;
+                string Picked_Gender;
+                string Picked_phone;
+                string Picked_city;
+                bool Picked_is_blocked;
+
+                for (; data[i] = '|'; i++)
+                {
+                    Picked_cnic = Picked_cnic + data[i];
+                }
+                if (Picked_cnic != cnic)
+                {
+                    for (; data[i] != '|'; i++)
+                    {
+                        Picked_name += data[i];
+                    }
+
+                    i++;
+                    for (; data[i] != '|'; i++)
+                    {
+                        Picked_Gender += data[i];
+                    }
+
+                    i++;
+                    for (; data[i] != '|'; i++)
+                    {
+                        Picked_phone += data[i];
+                    }
+
+                    i++;
+                    for (; data[i] != '|'; i++)
+                    {
+                        Picked_city += data[i];
+                    }
+
+                    i++;
+                    for (; data[i] != '\0'; i++)
+                    {
+                        Picked_is_blocked = (data[i] == '1');
+                    }
+                    file_temp << Picked_cnic << "|" << Picked_password << "|" << Picked_name << "|" << Picked_Gender << "|" << Picked_phone << "|" << Picked_city << "|" << Picked_is_blocked << endl;
+                }
+            }
+            ofstream file_real("Customers.txt");
+            ifstream file_temp("Temp.txt");
+            if (!(file_real.is_open() && file_temp.is_open()))
+            {
+                while (getline(file_temp, data))
+                {
+                    file_real << data << endl;
+                }
+            }
+            return 1;
+        }
     }
 };
+bool Customer::login(string e_cnic, string e_password, Customer *customer)
+{
+    F_M_Customers F_M_C;
+    if (F_M_C.F_M_Load("Customers.txt", customer, e_cnic, e_password))
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+}
 int main()
 {
 }

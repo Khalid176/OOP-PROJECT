@@ -16,7 +16,7 @@ int main()
     int coordinate_X = 0;
     int coordinate_Y = 0;
     int filter = -67;
-    string name_of_file = "test2.jpg";
+    string name_of_file = "test.jpg";
     string type;
     int size;
     for (size = 0; name_of_file[size] != '\0'; size++)

@@ -131,7 +131,6 @@ F_M Costomers :
 
 F_M FILTER_CATALOG :
 + F_M LOAD(filename : string ) : vector<Filter*>
-+ F_M SAVE(filename : string, filters :  vector<Filter*>) : bool
 + F_M TOGGLE_AVAILABILITY( filename : string, filterID : int ) : bool
 
 F_M SESSIONS :

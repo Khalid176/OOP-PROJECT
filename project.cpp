@@ -82,6 +82,7 @@ int Pixel::clamp_unity(int value)
     {
         return 0;
     }
+    return value;
 }
 
 class F_M_READ_WRITE; // Forward declaration of the class F_M_READ_WRITE to be used in the saveable interface
@@ -442,10 +443,11 @@ class Filter
 public:
     bool virtual apply(Image *image) = 0;
     bool virtual is_avaliable() = 0;
+    void virtual set_avaliable(bool avaliable) = 0;
     virtual ~Filter() {}
 
 protected:
-    bool avaliable;
+    bool avaliable = true;
 };
 class GrayScale : public Filter
 {
@@ -475,6 +477,10 @@ public:
     {
         return avaliable;
     }
+    void set_avaliable(bool avaliable)
+    {
+        this->avaliable = avaliable;
+    }
 };
 class Invert : public Filter
 {
@@ -503,6 +509,10 @@ public:
     bool is_avaliable()
     {
         return avaliable;
+    }
+    void set_avaliable(bool avaliable)
+    {
+        this->avaliable = avaliable;
     }
 };
 class Brightness_Adjust : public Filter
@@ -539,6 +549,10 @@ public:
     bool is_avaliable()
     {
         return avaliable;
+    }
+    void set_avaliable(bool avaliable)
+    {
+        this->avaliable = avaliable;
     }
 };
 class Contrast_Stretch : public Filter
@@ -605,6 +619,10 @@ public:
     {
         return avaliable;
     }
+    void set_avaliable(bool avaliable)
+    {
+        this->avaliable = avaliable;
+    }
 };
 class Red_Channel_Only : public Filter
 {
@@ -632,6 +650,10 @@ public:
     bool is_avaliable()
     {
         return avaliable;
+    }
+    void set_avaliable(bool avaliable)
+    {
+        this->avaliable = avaliable;
     }
 };
 class Green_Channel_Only : public Filter
@@ -661,6 +683,10 @@ public:
     {
         return avaliable;
     }
+    void set_avaliable(bool avaliable)
+    {
+        this->avaliable = avaliable;
+    }
 };
 class Blue_Channel_Only : public Filter
 {
@@ -688,6 +714,10 @@ public:
     bool is_avaliable()
     {
         return avaliable;
+    }
+    void set_avaliable(bool avaliable)
+    {
+        this->avaliable = avaliable;
     }
 };
 class Box_Blur : public Filter
@@ -779,6 +809,10 @@ public:
     {
         return avaliable;
     }
+    void set_avaliable(bool avaliable)
+    {
+        this->avaliable = avaliable;
+    }
 };
 class Flip_Horizontal : public Filter
 {
@@ -808,6 +842,10 @@ public:
     {
         return avaliable;
     }
+    void set_avaliable(bool avaliable)
+    {
+        this->avaliable = avaliable;
+    }
 };
 class Flip_Vertical : public Filter
 {
@@ -836,6 +874,10 @@ public:
     bool is_avaliable()
     {
         return avaliable;
+    }
+    void set_avaliable(bool avaliable)
+    {
+        this->avaliable = avaliable;
     }
 };
 
@@ -897,6 +939,7 @@ public:
     }
 };
 class F_M_Customers;
+class Customer;
 class user
 {
     friend class F_M_Customers;
@@ -910,7 +953,7 @@ protected:
     string password;
 
 public:
-    bool virtual login(string cnic, string password, Customer *customer) = 0;
+    bool virtual login(string cnic, string password) = 0;
 };
 
 // Customer strting ====================================
@@ -936,11 +979,7 @@ public:
     {
         return is_blocked;
     }
-    bool login(string e_cnic, string e_password, Customer *customer); // forward declaration
-    bool display_history()
-    {
-        //  would be done in F_M_Sessions
-    }
+    bool login(string e_cnic, string e_password); // forward declaration
 };
 class F_M_Customers
 {
@@ -961,7 +1000,7 @@ public:
         if (!file.is_open())
         {
             cout << "Error: Could not open the file!" << endl;
-            return 0;
+            return nullptr;
         }
         string data;
         while (getline(file, data))
@@ -1040,25 +1079,28 @@ public:
                     {
                         cout << "User has been blocked by the admin \n ";
                         file.close();
+                        return nullptr;
                     }
                 }
             }
         }
         file.close();
-        return customer;
+        return nullptr;
     }
-    bool F_M_Save(Customer *customer)
+    int F_M_Save(Customer *customer)
     {
         ofstream file("Customers.txt", ios::app);
         if (!file.is_open())
         {
             cout << "UNABLE TO OPEN THE FILE " << endl;
+            return -1;
         }
         else
         {
             file << customer->cnic << "|" << customer->password << "|" << customer->name << "|" << customer->Gender << "|" << customer->phone << "|" << customer->city << "|" << 0 << endl;
+            file.close();
+            return 1;
         }
-        file.close();
     }
 
     int F_M_Customer_Counter()
@@ -1067,6 +1109,7 @@ public:
         if (!file.is_open())
         {
             cout << "UNABLE TO OPEN THE FILE " << endl;
+            return -1;
         }
         else
         {
@@ -1080,7 +1123,7 @@ public:
             return counter;
         }
     }
-    bool F_M_Delete(string cnic)
+    int F_M_Delete(string cnic)
     {
         int count = F_M_Customer_Counter();
         ifstream file_real("Customers.txt");
@@ -1088,7 +1131,7 @@ public:
         if (!(file_real.is_open() && file_temp.is_open()))
         {
             cout << "UNABLE TO OpEN THE FILE " << endl;
-            return 0;
+            return -1;
         }
         else
         {
@@ -1160,6 +1203,7 @@ public:
             ifstream file_temp("Temp.txt");
             if (!(file_real.is_open() && file_temp.is_open()))
             {
+                return -1;
             }
             else
             {
@@ -1227,7 +1271,7 @@ public:
             if (!(file_real2.is_open() && file_temp2.is_open()))
             {
                 cout << "UNABLE TO OpEN THE FILE second last" << endl;
-                return 0;
+                return -1;
             }
             else
             {
@@ -1235,7 +1279,8 @@ public:
                 string data2;
                 if (!(file_real2.is_open() && file_temp2.is_open()))
                 {
-                    return 0;
+                    cout << "UNABLE TO OpEN THE FILE second last" << endl;
+                    return -1;
                 }
                 else
                 {
@@ -1281,7 +1326,7 @@ public:
                     if (!(file_real2.is_open() && file_temp2.is_open()))
                     {
                         cout << "UNABLE TO OPEN THE FILE last" << endl;
-                        return 0;
+                        return -1;
                     }
                     else
                     {
@@ -1297,15 +1342,16 @@ public:
                 }
             }
         }
+        return 0;
     }
-    bool F_M_Toogle(string cnic)
+    int F_M_Toogle(string cnic)
     {
         ifstream file_real("Customers.txt");
         ofstream file_temp("Temp.txt");
         if (!(file_real.is_open() && file_temp.is_open()))
         {
             cout << "UNABLE TO OpEN THE FILE " << endl;
-            return 0;
+            return -1;
         }
         else
         {
@@ -1367,6 +1413,13 @@ public:
                         picked_is_blocked = !(data[i] == '1');
                     }
                 }
+                else
+                {
+                    for (; data[i] != '\0'; i++)
+                    {
+                        picked_is_blocked = (data[i] == '1');
+                    }
+                }
                 file_temp << picked_cnic << "|" << picked_password << "|" << picked_name << "|" << picked_Gender << "|" << picked_phone << "|" << picked_city << "|" << picked_is_blocked << endl;
             }
             file_real.close();
@@ -1376,6 +1429,7 @@ public:
             if (!(file_real.is_open() && file_temp.is_open()))
             {
                 cout << "UNABLE TO OPEN FILES";
+                return -1;
             }
             else
             {
@@ -1437,6 +1491,7 @@ public:
                 return 1;
             }
         }
+        return 0;
     }
     Customer *F_M_SEARCH(string cnic, Customer *customer)
     {
@@ -1531,14 +1586,18 @@ public:
                     {
                         cout << "User has been blocked by the admin \n ";
                         file.close();
+                        return nullptr;
                     }
                 }
             }
         }
+        file.close();
+        return nullptr;
     }
 };
 class F_M_SESSIONS
 {
+public:
     void F_M_LOAD_FOR_SPECIFIC_USER(string cnic)
     {
         ifstream file_real2("Sessions.txt");
@@ -1594,7 +1653,7 @@ class F_M_SESSIONS
             }
         }
     }
-    bool F_M_APPEND_SESSION(string cnic, string timestamp, string filterpipeline, string image_name)
+    int F_M_APPEND_SESSION(string cnic, string timestamp, string filterpipeline, string image_name)
     {
         ofstream file("Sessions.txt", ios::app);
         string data;
@@ -1602,7 +1661,7 @@ class F_M_SESSIONS
         if (!file.is_open())
         {
             cout << "UNABLE TO OPEN FILE ";
-            return 0;
+            return -1;
         }
         else
         {
@@ -1610,21 +1669,21 @@ class F_M_SESSIONS
             return 1;
         }
     }
-    bool F_M_DELETE_SESSIONS_FOR_SPECIFIC_USER(string cnic)
+    int F_M_DELETE_SESSIONS_FOR_SPECIFIC_USER(string cnic)
     {
         ifstream file_real2("Sessions.txt");
         ofstream file_temp2("Temp2.txt");
         if (!(file_real2.is_open() && file_temp2.is_open()))
         {
             cout << "UNABLE TO OpEN THE FILE " << endl;
-            return 0;
+            return -1;
         }
         else
         {
             string data2;
             if (!(file_real2.is_open() && file_temp2.is_open()))
             {
-                return 0;
+                return -1;
             }
             else
             {
@@ -1670,7 +1729,7 @@ class F_M_SESSIONS
                 if (!(file_real2.is_open() && file_temp2.is_open()))
                 {
                     cout << "UNABLE TO OPEN THE FILE last" << endl;
-                    return 0;
+                    return -1;
                 }
                 else
                 {
@@ -1687,10 +1746,172 @@ class F_M_SESSIONS
         }
     }
 };
-bool Customer::login(string e_cnic, string e_password, Customer *customer)
+class filter_catalog
+{
+    public:
+    int F_M_TOGGLE_AVAILABILITY(string filter_id)
+    {
+        ifstream file_real2("Catalog.txt");
+        ofstream file_temp2("Temp3.txt");
+        if (!(file_real2.is_open() && file_temp2.is_open()))
+        {
+            cout << "UNABLE TO OpEN THE FILE " << endl;
+            return -1;
+        }
+        else
+        {
+            string data2;
+            if (!(file_real2.is_open() && file_temp2.is_open()))
+            {
+                return -1;
+            }
+            else
+            {
+                while (getline(file_real2, data2))
+                {
+
+                    int i = 0;
+                    string picked_filter_id, picked_filter_name, picked_Category;
+                    bool picked_IsEnabled;
+                    for (; data2[i] != '|'; i++)
+                    {
+                        picked_filter_id = picked_filter_id + data2[i];
+                    }
+                    i++;
+
+                    for (; data2[i] != '|'; i++)
+                    {
+                        picked_filter_name += data2[i];
+                    }
+
+                    i++;
+                    for (; data2[i] != '|'; i++)
+                    {
+                        picked_Category += data2[i];
+                    }
+
+                    i++;
+                    if (picked_filter_id == filter_id)
+                    {
+
+                        for (; data2[i] != '\0'; i++)
+                        {
+
+                            picked_IsEnabled = !(data2[i] == '1');
+                        }
+
+                        i++;
+                    }
+                    else
+                    {
+
+                        for (; data2[i] != '\0'; i++)
+                        {
+                            picked_IsEnabled = (data2[i] == '1');
+                        }
+
+                        i++;
+                    }
+
+                    file_temp2 << picked_filter_id << "|" << picked_filter_name << "|" << picked_Category << "|" << picked_IsEnabled << endl;
+                }
+            }
+
+            file_real2.close();
+            file_temp2.close();
+            ofstream file_real2("Catalog.txt");
+            ifstream file_temp2("Temp3.txt");
+
+            if (!(file_real2.is_open() && file_temp2.is_open()))
+            {
+                cout << "UNABLE TO OPEN THE FILE last" << endl;
+                return -1;
+            }
+            else
+            {
+                while (getline(file_temp2, data2))
+                {
+                    file_real2 << data2 << endl;
+                }
+            }
+
+            file_real2.close();
+            file_temp2.close();
+            return 1;
+        }
+    }
+    int F_M_Load(bool *array, Filter *filters[], int count)
+    {
+
+        ifstream file_real2("Catalog.txt");
+
+        if (!(file_real2.is_open()))
+        {
+            cout << "UNABLE TO OpEN THE FILE " << endl;
+            return -1;
+        }
+        else
+        {
+            int counter = 0;
+            string data2;
+            if (!(file_real2.is_open()))
+            {
+                return -1;
+            }
+            else
+            {
+                while (getline(file_real2, data2))
+                {
+
+                    int i = 0;
+                    string picked_filter_id, picked_filter_name, picked_Category;
+                    bool picked_IsEnabled;
+                    for (; data2[i] != '|'; i++)
+                    {
+                        picked_filter_id = picked_filter_id + data2[i];
+                    }
+                    i++;
+
+                    for (; data2[i] != '|'; i++)
+                    {
+                        picked_filter_name += data2[i];
+                    }
+
+                    i++;
+                    for (; data2[i] != '|'; i++)
+                    {
+                        picked_Category += data2[i];
+                    }
+
+                    i++;
+
+                    for (; data2[i] != '\0'; i++)
+                    {
+
+                        picked_IsEnabled = (data2[i] == '1');
+                    }
+
+                    i++;
+                    array[counter] = picked_IsEnabled;
+                    counter++;
+                }
+            }
+
+            file_real2.close();
+
+            for (int i = 0; i < 10; i++)
+            {
+                bool temp = array[i];
+                filters[i]->set_avaliable(temp);
+            }
+            return 1;
+        }
+    }
+};
+bool Customer::login(string e_cnic, string e_password)
 {
     F_M_Customers F_M_C;
-    if (F_M_C.F_M_Load("Customers.txt", customer, e_cnic, e_password))
+    if (F_M_C.F_M_Load("Customers.txt", this, e_cnic, e_password))
     {
         return 1;
     }

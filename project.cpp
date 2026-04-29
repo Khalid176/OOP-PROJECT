@@ -965,6 +965,16 @@ class Customer : public user
 
 public:
     friend class F_M_Customers;
+    Customer()
+    {
+        name = "";
+        phone = "";
+        city = "";
+        password = "";
+        Gender = "";
+        cnic = "";
+        is_blocked = false;
+    }
     Customer(string name, string phone, string city, string password, string Gender, string cnic)
     {
         this->name = name;
@@ -1421,6 +1431,39 @@ public:
                     }
                 }
                 file_temp << picked_cnic << "|" << picked_password << "|" << picked_name << "|" << picked_Gender << "|" << picked_phone << "|" << picked_city << "|" << picked_is_blocked << endl;
+                if ((picked_is_blocked == 1) && (picked_cnic == cnic))
+                {
+                    ofstream file_block("Blocked_Cnics.txt", ios::app);
+
+                    file_block << picked_cnic << endl;
+                    file_block.close();
+                }
+                else if ((picked_cnic == cnic) && (picked_is_blocked == 0))
+                {
+                    ifstream file_blocked("Blocked_Cnics.txt");
+                    ofstream file_blocked_temp("Blocked_Cnics_temp.txt");
+                    string fata;
+                    while (getline(file_blocked, fata))
+                    {
+                        if (cnic != fata)
+                        {
+                            file_blocked_temp << fata << endl;
+                        }
+                    }
+                    file_blocked.close();
+                    file_blocked_temp.close();
+
+                    ofstream file_blocked2("Blocked_Cnics.txt");
+                    ifstream file_blocked_temp2("Blocked_Cnics_temp.txt");
+                    string fata2;
+
+                    while (getline(file_blocked_temp2, fata2))
+                    {
+                        file_blocked2 << fata2 << endl;
+                    }
+                    file_blocked2.close();
+                    file_blocked_temp2.close();
+                }
             }
             file_real.close();
             file_temp.close();
@@ -1586,7 +1629,7 @@ public:
                     {
                         cout << "User has been blocked by the admin \n ";
                         file.close();
-                        return nullptr;
+                        return customer;
                     }
                 }
             }
@@ -1746,9 +1789,9 @@ public:
         }
     }
 };
-class filter_catalog
+class F_M_filter_catalog
 {
-    public:
+public:
     int F_M_TOGGLE_AVAILABILITY(string filter_id)
     {
         ifstream file_real2("Catalog.txt");
@@ -1800,7 +1843,7 @@ class filter_catalog
                             picked_IsEnabled = !(data2[i] == '1');
                         }
 
-                        i++;
+                        
                     }
                     else
                     {
@@ -1810,7 +1853,7 @@ class filter_catalog
                             picked_IsEnabled = (data2[i] == '1');
                         }
 
-                        i++;
+                        
                     }
 
                     file_temp2 << picked_filter_id << "|" << picked_filter_name << "|" << picked_Category << "|" << picked_IsEnabled << endl;
@@ -1840,7 +1883,7 @@ class filter_catalog
             return 1;
         }
     }
-    int F_M_Load(bool *array, Filter *filters[], int count)
+    int F_M_Load(bool *array, Filter *filters[])
     {
 
         ifstream file_real2("Catalog.txt");
@@ -1905,6 +1948,170 @@ class filter_catalog
                 filters[i]->set_avaliable(temp);
             }
             return 1;
+        }
+    }
+};
+class Admin : public user
+{
+public:
+    bool login(string cnic, string e_password)
+    {
+        if (cnic == "6767678696969" && e_password == "khalid@2020")
+        {
+            return 1;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+    bool toggle_block(string cnic)
+    {
+        F_M_Customers F_M_C;
+        
+        return (F_M_C.F_M_Toogle(cnic));
+    }
+    bool toggle_filter(string filter_ID)
+    {
+        F_M_filter_catalog F_M_F_C;
+        return (F_M_F_C.F_M_TOGGLE_AVAILABILITY(filter_ID));
+        
+    }
+    bool delete_account(string cnic)
+    {
+        F_M_Customers F_M_C;
+        return (F_M_C.F_M_Delete(cnic));
+        
+    }
+    void view_sessions_All()
+    {
+        ifstream file_real2("Sessions.txt");
+        // ofstream file_temp2("Temp2.txt");
+        if (!(file_real2.is_open() /*&& file_temp2.is_open()*/))
+        {
+            cout << "UNABLE TO OpEN THE FILE " << endl;
+        }
+        else
+        {
+            string data2;
+            if (!(file_real2.is_open() /*&& file_temp2.is_open()*/))
+            {
+                cout << "UNABLE TO OpEN THE FILE " << endl;
+            }
+            else
+            {
+                while (getline(file_real2, data2))
+                {
+                    int i = 0;
+                    string picked_cnic, picked_Timestamp, picked_FiltersAplied, picked_OutputFile;
+                    for (; data2[i] != '|'; i++)
+                    {
+                        picked_cnic = picked_cnic + data2[i];
+                    }
+                    i++;
+
+                    for (; data2[i] != '|'; i++)
+                    {
+                        picked_Timestamp += data2[i];
+                    }
+
+                    i++;
+                    for (; data2[i] != '|'; i++)
+                    {
+                        picked_FiltersAplied += data2[i];
+                    }
+
+                    i++;
+                    for (; data2[i] != '\0'; i++)
+                    {
+                        picked_OutputFile += data2[i];
+                    }
+
+                    i++;
+
+                    cout << picked_cnic << "|" << picked_Timestamp << "|" << picked_FiltersAplied << "|" << picked_OutputFile << endl;
+                }
+
+                file_real2.close();
+            }
+        }
+    }
+    void view_sessions_single_user(string cnic)
+    {
+        F_M_SESSIONS F_M_S;
+        F_M_S.F_M_LOAD_FOR_SPECIFIC_USER(cnic);
+    }
+    void Display_blocked()
+    {
+        ifstream file_real("Customers.txt");
+
+        if (!(file_real.is_open()))
+        {
+            cout << "UNABLE TO OpEN THE FILE " << endl;
+        }
+        else
+        {
+            int count = 1;
+            string data;
+            while (getline(file_real, data))
+            {
+                int i = 0;
+
+                string picked_password;
+                string picked_cnic;
+                string picked_name;
+                string picked_Gender;
+                string picked_phone;
+                string picked_city;
+                bool picked_is_blocked;
+
+                for (; data[i] != '|'; i++)
+                {
+                    picked_cnic = picked_cnic + data[i];
+                }
+                i++;
+
+                for (; data[i] != '|'; i++)
+                {
+                    picked_password += data[i];
+                }
+
+                i++;
+                for (; data[i] != '|'; i++)
+                {
+                    picked_name += data[i];
+                }
+
+                i++;
+                for (; data[i] != '|'; i++)
+                {
+                    picked_Gender += data[i];
+                }
+
+                i++;
+                for (; data[i] != '|'; i++)
+                {
+                    picked_phone += data[i];
+                }
+
+                i++;
+                for (; data[i] != '|'; i++)
+                {
+                    picked_city += data[i];
+                }
+
+                i++;
+
+                for (; data[i] != '\0'; i++)
+                {
+                    picked_is_blocked = (data[i] == '1');
+                }
+                if (picked_is_blocked == 1)
+                {
+                    cout << picked_cnic << "|" << picked_password << "|" << picked_name << "|" << picked_Gender << "|" << picked_phone << "|" << picked_city << "|" << picked_is_blocked << endl;
+                }
+            }
+            file_real.close();
         }
     }
 };

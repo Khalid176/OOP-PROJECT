@@ -12,9 +12,9 @@ From user ->
 Admin :
 + login( cnic : string,  password : string) : bool
 + toggle_block( cnic:string) : bool
-+ toggle_filter( filterID:int) : bool
++ toggle_filter( filterID:string) : bool
 + delete_account( cnic:string) : bool
-+ view_sessions_All( filepath:string) : void 
++ view_sessions_All( filepath:string) : void
 + view_sessions_single_user( filepath : string, cnic : string ) : void
 + Display_blocked( filepath : string ) : void
 

@@ -1362,37 +1362,37 @@ public:
                 string picked_city;
                 bool picked_is_blocked;
 
-                for (; data[i] != '|'; i++)
+                for (; data[i] != '\0' && data[i] != '|'; i++)
                 {
                     picked_cnic = picked_cnic + data[i];
                 }
                 i++;
 
-                for (; data[i] != '|'; i++)
+                for (; data[i] != '\0' && data[i] != '|'; i++)
                 {
                     picked_password += data[i];
                 }
 
                 i++;
-                for (; data[i] != '|'; i++)
+                for (; data[i] != '\0' && data[i] != '|'; i++)
                 {
                     picked_name += data[i];
                 }
 
                 i++;
-                for (; data[i] != '|'; i++)
+                for (; data[i] != '\0' && data[i] != '|'; i++)
                 {
                     picked_Gender += data[i];
                 }
 
                 i++;
-                for (; data[i] != '|'; i++)
+                for (; data[i] != '\0' && data[i] != '|'; i++)
                 {
                     picked_phone += data[i];
                 }
 
                 i++;
-                for (; data[i] != '|'; i++)
+                for (; data[i] != '\0' && data[i] != '|'; i++)
                 {
                     picked_city += data[i];
                 }
@@ -1444,7 +1444,7 @@ public:
             }
 
             i++;
-            for (; data[i] != '|'; i++)
+            for (; data[i] != '\0' && data[i] != '|'; i++)
             {
                 Picked_password += data[i];
             }
@@ -1461,25 +1461,25 @@ public:
             {
                 if ((Picked_password == password) && (Picked_cnic == cnic))
                 {
-                    for (; data[i] != '|'; i++)
+                    for (; data[i] != '\0' && data[i] != '|'; i++)
                     {
                         Picked_name += data[i];
                     }
 
                     i++;
-                    for (; data[i] != '|'; i++)
+                    for (; data[i] != '\0' && data[i] != '|'; i++)
                     {
                         Picked_Gender += data[i];
                     }
 
                     i++;
-                    for (; data[i] != '|'; i++)
+                    for (; data[i] != '\0' && data[i] != '|'; i++)
                     {
                         Picked_phone += data[i];
                     }
 
                     i++;
-                    for (; data[i] != '|'; i++)
+                    for (; data[i] != '\0' && data[i] != '|'; i++)
                     {
                         Picked_city += data[i];
                     }
@@ -1576,7 +1576,7 @@ public:
                 string picked_city;
                 bool picked_is_blocked;
 
-                for (; data[i] != '|'; i++)
+                for (; data[i] != '\0' && data[i] != '|'; i++)
                 {
                     picked_cnic = picked_cnic + data[i];
                 }
@@ -1585,31 +1585,31 @@ public:
                 if (picked_cnic != cnic)
                 {
 
-                    for (; data[i] != '|'; i++)
+                    for (; data[i] != '\0' && data[i] != '|'; i++)
                     {
                         picked_password += data[i];
                     }
 
                     i++;
-                    for (; data[i] != '|'; i++)
+                    for (; data[i] != '\0' && data[i] != '|'; i++)
                     {
                         picked_name += data[i];
                     }
 
                     i++;
-                    for (; data[i] != '|'; i++)
+                    for (; data[i] != '\0' && data[i] != '|'; i++)
                     {
                         picked_Gender += data[i];
                     }
 
                     i++;
-                    for (; data[i] != '|'; i++)
+                    for (; data[i] != '\0' && data[i] != '|'; i++)
                     {
                         picked_phone += data[i];
                     }
 
                     i++;
-                    for (; data[i] != '|'; i++)
+                    for (; data[i] != '\0' && data[i] != '|'; i++)
                     {
                         picked_city += data[i];
                     }
@@ -1644,7 +1644,7 @@ public:
                     string picked_city;
                     bool picked_is_blocked;
 
-                    for (; data[i] != '|'; i++)
+                    for (; data[i] != '\0' && data[i] != '|'; i++)
                     {
                         picked_cnic = picked_cnic + data[i];
                     }
@@ -1652,30 +1652,30 @@ public:
 
                     if (picked_cnic != cnic)
                     {
-                        for (; data[i] != '|'; i++)
+                        for (; data[i] != '\0' && data[i] != '|'; i++)
                         {
                             picked_password += data[i];
                         }
                         i++;
-                        for (; data[i] != '|'; i++)
+                        for (; data[i] != '\0' && data[i] != '|'; i++)
                         {
                             picked_name += data[i];
                         }
 
                         i++;
-                        for (; data[i] != '|'; i++)
+                        for (; data[i] != '\0' && data[i] != '|'; i++)
                         {
                             picked_Gender += data[i];
                         }
 
                         i++;
-                        for (; data[i] != '|'; i++)
+                        for (; data[i] != '\0' && data[i] != '|'; i++)
                         {
                             picked_phone += data[i];
                         }
 
                         i++;
-                        for (; data[i] != '|'; i++)
+                        for (; data[i] != '\0' && data[i] != '|'; i++)
                         {
                             picked_city += data[i];
                         }
@@ -1714,20 +1714,20 @@ public:
                     {
                         int i = 0;
                         string picked_cnic, picked_Timestamp, picked_FiltersAplied, picked_OutputFile;
-                        for (; data2[i] != '|'; i++)
+                        for (; data2[i] != '\0' && data2[i] != '|'; i++)
                         {
                             picked_cnic = picked_cnic + data2[i];
                         }
                         i++;
                         if (picked_cnic != cnic)
                         {
-                            for (; data2[i] != '|'; i++)
+                            for (; data2[i] != '\0' && data2[i] != '|'; i++)
                             {
                                 picked_Timestamp += data2[i];
                             }
 
                             i++;
-                            for (; data2[i] != '|'; i++)
+                            for (; data2[i] != '\0' && data2[i] != '|'; i++)
                             {
                                 picked_FiltersAplied += data2[i];
                             }
@@ -1796,37 +1796,37 @@ public:
                 string picked_city;
                 bool picked_is_blocked;
 
-                for (; data[i] != '|'; i++)
+                for (; data[i] != '\0' && data[i] != '|'; i++)
                 {
                     picked_cnic = picked_cnic + data[i];
                 }
                 i++;
 
-                for (; data[i] != '|'; i++)
+                for (; data[i] != '\0' && data[i] != '|'; i++)
                 {
                     picked_password += data[i];
                 }
 
                 i++;
-                for (; data[i] != '|'; i++)
+                for (; data[i] != '\0' && data[i] != '|'; i++)
                 {
                     picked_name += data[i];
                 }
 
                 i++;
-                for (; data[i] != '|'; i++)
+                for (; data[i] != '\0' && data[i] != '|'; i++)
                 {
                     picked_Gender += data[i];
                 }
 
                 i++;
-                for (; data[i] != '|'; i++)
+                for (; data[i] != '\0' && data[i] != '|'; i++)
                 {
                     picked_phone += data[i];
                 }
 
                 i++;
-                for (; data[i] != '|'; i++)
+                for (; data[i] != '\0' && data[i] != '|'; i++)
                 {
                     picked_city += data[i];
                 }
@@ -1904,36 +1904,36 @@ public:
                     string picked_city;
                     bool picked_is_blocked;
 
-                    for (; data[i] != '|'; i++)
+                    for (; data[i] != '\0' && data[i] != '|'; i++)
                     {
                         picked_cnic = picked_cnic + data[i];
                     }
                     i++;
 
-                    for (; data[i] != '|'; i++)
+                    for (; data[i] != '\0' && data[i] != '|'; i++)
                     {
                         picked_password += data[i];
                     }
                     i++;
-                    for (; data[i] != '|'; i++)
+                    for (; data[i] != '\0' && data[i] != '|'; i++)
                     {
                         picked_name += data[i];
                     }
 
                     i++;
-                    for (; data[i] != '|'; i++)
+                    for (; data[i] != '\0' && data[i] != '|'; i++)
                     {
                         picked_Gender += data[i];
                     }
 
                     i++;
-                    for (; data[i] != '|'; i++)
+                    for (; data[i] != '\0' && data[i] != '|'; i++)
                     {
                         picked_phone += data[i];
                     }
 
                     i++;
-                    for (; data[i] != '|'; i++)
+                    for (; data[i] != '\0' && data[i] != '|'; i++)
                     {
                         picked_city += data[i];
                     }
@@ -1997,31 +1997,31 @@ public:
 
                 if ((Picked_cnic == cnic))
                 {
-                    for (; data[i] != '|'; i++)
+                    for (; data[i] != '\0' && data[i] != '|'; i++)
                     {
                         Picked_password += data[i];
                     }
 
                     i++;
-                    for (; data[i] != '|'; i++)
+                    for (; data[i] != '\0' && data[i] != '|'; i++)
                     {
                         Picked_name += data[i];
                     }
 
                     i++;
-                    for (; data[i] != '|'; i++)
+                    for (; data[i] != '\0' && data[i] != '|'; i++)
                     {
                         Picked_Gender += data[i];
                     }
 
                     i++;
-                    for (; data[i] != '|'; i++)
+                    for (; data[i] != '\0' && data[i] != '|'; i++)
                     {
                         Picked_phone += data[i];
                     }
 
                     i++;
-                    for (; data[i] != '|'; i++)
+                    for (; data[i] != '\0' && data[i] != '|'; i++)
                     {
                         Picked_city += data[i];
                     }
@@ -2087,13 +2087,13 @@ public:
             }
 
             i++;
-            for (; data[i] != '|'; i++)
+            for (; data[i] != '\0' && data[i] != '|'; i++)
             {
                 Picked_password += data[i];
             }
 
             i++;
-            for (; data[i] != '|'; i++)
+            for (; data[i] != '\0' && data[i] != '|'; i++)
             {
                 Picked_name += data[i];
             }
@@ -2110,19 +2110,19 @@ public:
                 if ((Picked_name == name))
                 {
 
-                    for (; data[i] != '|'; i++)
+                    for (; data[i] != '\0' && data[i] != '|'; i++)
                     {
                         Picked_Gender += data[i];
                     }
 
                     i++;
-                    for (; data[i] != '|'; i++)
+                    for (; data[i] != '\0' && data[i] != '|'; i++)
                     {
                         Picked_phone += data[i];
                     }
 
                     i++;
-                    for (; data[i] != '|'; i++)
+                    for (; data[i] != '\0' && data[i] != '|'; i++)
                     {
                         Picked_city += data[i];
                     }
@@ -2174,7 +2174,7 @@ public:
         {
             int i = 0;
             string picked_cnic;
-            for (; data[i] != '|'; i++)
+            for (; data[i] != '\0' && data[i] != '|'; i++)
             {
                 picked_cnic += data[i];
             }
@@ -2207,20 +2207,20 @@ public:
                 {
                     int i = 0;
                     string picked_cnic, picked_Timestamp, picked_FiltersAplied, picked_OutputFile;
-                    for (; data2[i] != '|'; i++)
+                    for (; data2[i] != '\0' && data2[i] != '|'; i++)
                     {
                         picked_cnic = picked_cnic + data2[i];
                     }
                     i++;
                     if (picked_cnic == cnic)
                     {
-                        for (; data2[i] != '|'; i++)
+                        for (; data2[i] != '\0' && data2[i] != '|'; i++)
                         {
                             picked_Timestamp += data2[i];
                         }
 
                         i++;
-                        for (; data2[i] != '|'; i++)
+                        for (; data2[i] != '\0' && data2[i] != '|'; i++)
                         {
                             picked_FiltersAplied += data2[i];
                         }
@@ -2279,20 +2279,20 @@ public:
                 {
                     int i = 0;
                     string picked_cnic, picked_Timestamp, picked_FiltersAplied, picked_OutputFile;
-                    for (; data2[i] != '|'; i++)
+                    for (; data2[i] != '\0' && data2[i] != '|'; i++)
                     {
                         picked_cnic = picked_cnic + data2[i];
                     }
                     i++;
                     if (picked_cnic != cnic)
                     {
-                        for (; data2[i] != '|'; i++)
+                        for (; data2[i] != '\0' && data2[i] != '|'; i++)
                         {
                             picked_Timestamp += data2[i];
                         }
 
                         i++;
-                        for (; data2[i] != '|'; i++)
+                        for (; data2[i] != '\0' && data2[i] != '|'; i++)
                         {
                             picked_FiltersAplied += data2[i];
                         }
@@ -2361,19 +2361,19 @@ public:
                     int i = 0;
                     string picked_filter_id, picked_filter_name, picked_Category;
                     bool picked_IsEnabled;
-                    for (; data2[i] != '|'; i++)
+                    for (; data2[i] != '\0' && data2[i] != '|'; i++)
                     {
                         picked_filter_id = picked_filter_id + data2[i];
                     }
                     i++;
 
-                    for (; data2[i] != '|'; i++)
+                    for (; data2[i] != '\0' && data2[i] != '|'; i++)
                     {
                         picked_filter_name += data2[i];
                     }
 
                     i++;
-                    for (; data2[i] != '|'; i++)
+                    for (; data2[i] != '\0' && data2[i] != '|'; i++)
                     {
                         picked_Category += data2[i];
                     }
@@ -2450,19 +2450,19 @@ public:
                     int i = 0;
                     string picked_filter_id, picked_filter_name, picked_Category;
                     bool picked_IsEnabled;
-                    for (; data2[i] != '|'; i++)
+                    for (; data2[i] != '\0' && data2[i] != '|'; i++)
                     {
                         picked_filter_id = picked_filter_id + data2[i];
                     }
                     i++;
 
-                    for (; data2[i] != '|'; i++)
+                    for (; data2[i] != '\0' && data2[i] != '|'; i++)
                     {
                         picked_filter_name += data2[i];
                     }
 
                     i++;
-                    for (; data2[i] != '|'; i++)
+                    for (; data2[i] != '\0' && data2[i] != '|'; i++)
                     {
                         picked_Category += data2[i];
                     }
@@ -2514,19 +2514,19 @@ public:
                     int i = 0;
                     string picked_filter_id, picked_filter_name, picked_Category;
                     bool picked_IsEnabled;
-                    for (; data2[i] != '|'; i++)
+                    for (; data2[i] != '\0' && data2[i] != '|'; i++)
                     {
                         picked_filter_id = picked_filter_id + data2[i];
                     }
                     i++;
 
-                    for (; data2[i] != '|'; i++)
+                    for (; data2[i] != '\0' && data2[i] != '|'; i++)
                     {
                         picked_filter_name += data2[i];
                     }
 
                     i++;
-                    for (; data2[i] != '|'; i++)
+                    for (; data2[i] != '\0' && data2[i] != '|'; i++)
                     {
                         picked_Category += data2[i];
                     }
@@ -2570,19 +2570,19 @@ public:
                     int i = 0;
                     string picked_filter_id, picked_filter_name, picked_Category;
                     bool picked_IsEnabled;
-                    for (; data2[i] != '|'; i++)
+                    for (; data2[i] != '\0' && data2[i] != '|'; i++)
                     {
                         picked_filter_id = picked_filter_id + data2[i];
                     }
                     i++;
 
-                    for (; data2[i] != '|'; i++)
+                    for (; data2[i] != '\0' && data2[i] != '|'; i++)
                     {
                         picked_filter_name += data2[i];
                     }
 
                     i++;
-                    for (; data2[i] != '|'; i++)
+                    for (; data2[i] != '\0' && data2[i] != '|'; i++)
                     {
                         picked_Category += data2[i];
                     }
@@ -2663,19 +2663,19 @@ public:
                 {
                     int i = 0;
                     string picked_cnic, picked_Timestamp, picked_FiltersAplied, picked_OutputFile;
-                    for (; data2[i] != '|'; i++)
+                    for (; data2[i] != '\0' && data2[i] != '|'; i++)
                     {
                         picked_cnic = picked_cnic + data2[i];
                     }
                     i++;
 
-                    for (; data2[i] != '|'; i++)
+                    for (; data2[i] != '\0' && data2[i] != '|'; i++)
                     {
                         picked_Timestamp += data2[i];
                     }
 
                     i++;
-                    for (; data2[i] != '|'; i++)
+                    for (; data2[i] != '\0' && data2[i] != '|'; i++)
                     {
                         picked_FiltersAplied += data2[i];
                     }
@@ -2724,37 +2724,37 @@ public:
                 string picked_city;
                 bool picked_is_blocked;
 
-                for (; data[i] != '|'; i++)
+                for (; data[i] != '\0' && data[i] != '|'; i++)
                 {
                     picked_cnic = picked_cnic + data[i];
                 }
                 i++;
 
-                for (; data[i] != '|'; i++)
+                for (; data[i] != '\0' && data[i] != '|'; i++)
                 {
                     picked_password += data[i];
                 }
 
                 i++;
-                for (; data[i] != '|'; i++)
+                for (; data[i] != '\0' && data[i] != '|'; i++)
                 {
                     picked_name += data[i];
                 }
 
                 i++;
-                for (; data[i] != '|'; i++)
+                for (; data[i] != '\0' && data[i] != '|'; i++)
                 {
                     picked_Gender += data[i];
                 }
 
                 i++;
-                for (; data[i] != '|'; i++)
+                for (; data[i] != '\0' && data[i] != '|'; i++)
                 {
                     picked_phone += data[i];
                 }
 
                 i++;
-                for (; data[i] != '|'; i++)
+                for (; data[i] != '\0' && data[i] != '|'; i++)
                 {
                     picked_city += data[i];
                 }
@@ -2858,37 +2858,37 @@ public:
                 string picked_city;
                 bool picked_is_blocked;
 
-                for (; data[i] != '|'; i++)
+                for (; data[i] != '\0' && data[i] != '|'; i++)
                 {
                     picked_cnic = picked_cnic + data[i];
                 }
                 i++;
 
-                for (; data[i] != '|'; i++)
+                for (; data[i] != '\0' && data[i] != '|'; i++)
                 {
                     picked_password += data[i];
                 }
 
                 i++;
-                for (; data[i] != '|'; i++)
+                for (; data[i] != '\0' && data[i] != '|'; i++)
                 {
                     picked_name += data[i];
                 }
 
                 i++;
-                for (; data[i] != '|'; i++)
+                for (; data[i] != '\0' && data[i] != '|'; i++)
                 {
                     picked_Gender += data[i];
                 }
 
                 i++;
-                for (; data[i] != '|'; i++)
+                for (; data[i] != '\0' && data[i] != '|'; i++)
                 {
                     picked_phone += data[i];
                 }
 
                 i++;
-                for (; data[i] != '|'; i++)
+                for (; data[i] != '\0' && data[i] != '|'; i++)
                 {
                     picked_city += data[i];
                 }
@@ -4848,7 +4848,7 @@ mainmenu:
                     cout << "=";
                 }
                 cout << endl;
-                cout << "|| " << left << setw(41) << "Do you wish to give a name of your choosing or do you wish it to be autogenerated :  " << "||" << endl;
+                cout << "|| " << left << setw(41) << "Choose Naming Method :  " << "||" << endl;
                 cout << "|| " << left << setw(41) << "1. Autogenerated " << "||" << endl;
                 cout << "|| " << left << setw(41) << "2. Give name yourself " << endl;
 

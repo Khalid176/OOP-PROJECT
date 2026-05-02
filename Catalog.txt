@@ -1,4 +1,4 @@
-01|Grayscale|Pixel Transform|1
+01|Grayscale|Pixel Transform|0
 02|Invert|Pixel Transform|1
 03|Brightness Adjust|Pixel Transform|1
 04|Contrast Stretch|Pixel Transform|1

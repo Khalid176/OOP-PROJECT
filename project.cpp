@@ -3,6 +3,7 @@
 #include <iomanip>
 #include <fstream>
 #include <vector>
+#include <cstdio>
 #include <ctime>
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
@@ -70,7 +71,7 @@ public:
         return out;
     }
 };
-int Pixel::clamp_unity(int value)
+int Pixel::clamp_unity(int value) // Making it a sattic funtion that is the reson we will declare it outside the general class op
 {
     if ((value <= 255) && (value >= 0))
     {
@@ -89,13 +90,13 @@ int Pixel::clamp_unity(int value)
 
 class F_M_READ_WRITE; // Forward declaration of the class F_M_READ_WRITE to be used in the saveable interface
 
-class saveable
+class saveable // just for sake of multiple inheritance
 {
 public:
     bool virtual save(string outputPath, F_M_READ_WRITE &FM_RW) = 0;
 };
 
-class displayable
+class displayable // just for sake of multiple inheritance
 {
 public:
     void virtual display_Ascii() = 0;
@@ -109,14 +110,14 @@ class Image : public displayable, public saveable
     int height;
     int width;
     string file_name;
-    Pixel **Grid;
+    Pixel **Grid; // composition although here we are using the pointer but still these are bein produced and destroyed here only
 
 public:
     string file_name_getter()
     {
         return file_name;
     }
-    Image &operator=(const Image &other)
+    Image &operator=(const Image &other) // Assignemnt operator w
     {
         cout << "\033[34m" << "Image assignment operator called" << "\033[0m" << endl; // For submission only
         if (this == &other)
@@ -152,8 +153,8 @@ public:
         }
         return *this;
     }
-    bool save(string outputPath, F_M_READ_WRITE &FM_RW);
-    friend class FilterSession;
+    bool save(string outputPath, F_M_READ_WRITE &FM_RW); // forward declaration of funtion need this cause ths uses F_M_READ_ WRITE not defined yet
+    friend class FilterSession; // making Filtersession friend of image
     Image(string file_name, int height, int width)
     {
         cout << "\033[34m" << "Image object created with data" << "\033[0m" << endl; // For submission only
@@ -206,7 +207,7 @@ public:
     {
         return Grid;
     }
-    void display_Ascii_FUll()
+    void display_Ascii_FUll() // True Ascii display of image
     {
         for (int j = 0; j < height; j++)
         {
@@ -257,11 +258,11 @@ public:
             cout << "\n";
         }
     }
-    void display_Ascii_HALF()
+    void display_Ascii_HALF() // Scaled down display of ascii
     {
 
-        int rowStep = (height / 20) > 0 ? (height / 20) : 1;
-        int columnStep = (width / 40) > 0 ? (width / 40) : 1;
+        int rowStep = (height / 20) > 0 ? (height / 20) : 1;    
+        int columnStep = (width / 40) > 0 ? (width / 40) : 1; // would provide a dynamic colmun step depending upon the width of the image 
         int counter = 0; // counter to keep track of the number of pixels printed in the current row
         for (int j = 0; j < height; j++)
         {
@@ -323,7 +324,7 @@ public:
             }
         }
     }
-    void display_Ascii()
+    void display_Ascii() // calls required function 
     {
         char ahhh_Aik_or_choice = '\0';
 
@@ -349,7 +350,7 @@ public:
             display_Ascii_HALF();
         }
     }
-    Image(Image &other)
+    Image(Image &other) // copy constructor 
     {
         this->file_name = other.file_name;
         this->height = other.height;
@@ -369,7 +370,7 @@ public:
             }
         }
     }
-    ~Image()
+    ~Image() // destructor for image
     {
         cout << "\033[34m" << "Image object Destroyed " << "\033[0m" << endl; // For submission only
         if (Grid != nullptr)
@@ -409,7 +410,7 @@ public:
 
         file_name[size] = '\0';
         int counter = 0;
-        for (counter = 0; file_name[counter] != '.' && file_name[counter] != '\0'; counter++)
+        for (counter = 0; file_name[counter] != '.' && file_name[counter] != '\0'; counter++) // going till . to find type also added a fail safe if the file_name[i] reaches the end i.e '\0' it would stop
         {
         }
         if ((file_name[counter + 1] == 'j' && file_name[counter + 2] == 'p' && file_name[counter + 3] == 'g') && file_name[counter + 4] == '\0')
@@ -436,23 +437,23 @@ public:
         {
             for (int j = 0; j < height; j++)
             {
-                int Red = data[3 * (j * width + i) + 0];
+                int Red = data[3 * (j * width + i) + 0]; // AS the values are give in formate R1 , G1 , B1 , R2 , G2 , B2 .......
                 int Green = data[3 * (j * width + i) + 1];
                 int Blue = data[3 * (j * width + i) + 2];
-                image->GridGetter()[j][i].setter_Red(Red);
+                image->GridGetter()[j][i].setter_Red(Red); // used grid getter and grid setter
                 image->GridGetter()[j][i].setter_Green(Green);
                 image->GridGetter()[j][i].setter_Blue(Blue);
             }
         }
-        delete[] file_name;
-        stbi_image_free(data);
+        delete[] file_name; // memory clean up
+        stbi_image_free(data); // memory clean up
         return image;
     }
-    bool F_M_WRITE_IMAGE(Image *image, string outputPath)
+    bool F_M_WRITE_IMAGE(Image *image, string outputPath) 
     {
         int counter1 = 0;
-        string name_of_image = image->file_name_getter();
-        for (counter1 = 0; name_of_image[counter1] != '.' && name_of_image[counter1] != '\0'; counter1++)
+        string name_of_image = image->file_name_getter(); // Taking original name 
+        for (counter1 = 0; name_of_image[counter1] != '.' && name_of_image[counter1] != '\0'; counter1++) // finding type of original name with a fail safe
         {
         }
         string type_of_image;
@@ -469,7 +470,7 @@ public:
             cout << "\033[33m" << "Invalid TYPE OF IMAGE FAILED TO WRITE " << "\033[0m" << endl;
             return false;
         }
-        outputPath = outputPath + "." + type_of_image;
+        outputPath = outputPath + "." + type_of_image; // adding type in provided name 
         int size = 0;
         int width = image->getter_width();
         int height = image->getter_height();
@@ -511,7 +512,7 @@ public:
                 output_data[index + 2] = image->GridGetter()[j][i].getter_Blue();
             }
         }
-
+        // Writing and then memory clean up
         if (type == "jpg")
         {
             bool check = (stbi_write_jpg(file_path, width, height, 3, output_data, 100));
@@ -544,7 +545,7 @@ public:
     }
 };
 
-bool Image::save(string outputPath, F_M_READ_WRITE &FM_RW)
+bool Image::save(string outputPath, F_M_READ_WRITE &FM_RW) // was decalared in line 156
 {
 
     bool check = 0;
@@ -553,11 +554,11 @@ bool Image::save(string outputPath, F_M_READ_WRITE &FM_RW)
     return check;
 }
 
-class Filter
+class Filter // Abstract class 
 {
 
 public:
-    bool virtual apply(Image *image) = 0;
+    bool virtual apply(Image *image) = 0; 
     bool virtual is_avaliable() = 0;
     void virtual set_avaliable(bool avaliable) = 0;
     virtual ~Filter() {}
@@ -575,7 +576,7 @@ protected:
     string name;
     string ID;
 };
-class GrayScale : public Filter
+class GrayScale : public Filter 
 {
 
 public:
@@ -596,9 +597,10 @@ public:
                     int Green = image->GridGetter()[j][i].getter_Green();
                     int Blue = image->GridGetter()[j][i].getter_Blue();
 
-                    int average = (Red + Green + Blue) / 3;
+                    int average = (Red + Green + Blue) / 3; // finding avg
+                    // changing values to average
                     Red = average;
-                    Green = average;
+                    Green = average; 
                     Blue = average;
                     image->GridGetter()[j][i].setter_Red(Red);
                     image->GridGetter()[j][i].setter_Green(Green);
@@ -641,7 +643,7 @@ public:
                     int Red = image->GridGetter()[j][i].getter_Red();
                     int Green = image->GridGetter()[j][i].getter_Green();
                     int Blue = image->GridGetter()[j][i].getter_Blue();
-
+                    // Using Max - currnt to invert the values also using clamp funtion to keep them in bounds
                     Red = image->GridGetter()[j][i].clamp_unity(255 - Red);
                     Green = image->GridGetter()[j][i].clamp_unity(255 - Green);
                     Blue = image->GridGetter()[j][i].clamp_unity(255 - Blue);
@@ -746,7 +748,7 @@ public:
                     int Red = image->GridGetter()[j][i].getter_Red();
                     int Green = image->GridGetter()[j][i].getter_Green();
                     int Blue = image->GridGetter()[j][i].getter_Blue();
-
+                    // Finding min and max
                     int min = Red, max = Red;
                     if ((Red >= Blue) && (Red >= Green))
                     {
@@ -773,9 +775,9 @@ public:
                     {
                         min = Green;
                     }
-                    if (max != min)
+                    if (max != min) // if not RGB are all the same 
                     {
-
+                        
                         Red = image->GridGetter()[j][i].clamp_unity((float)(Red - min) / (max - min) * 255);
                         Green = image->GridGetter()[j][i].clamp_unity((float)(Green - min) / (max - min) * 255);
                         Blue = image->GridGetter()[j][i].clamp_unity((float)(Blue - min) / (max - min) * 255);
@@ -784,7 +786,7 @@ public:
                         image->GridGetter()[j][i].setter_Green(Green);
                         image->GridGetter()[j][i].setter_Blue(Blue);
                     }
-                    else
+                    else // if they are all ssame 
                     {
                         image->GridGetter()[j][i].setter_Red(Red);
                         image->GridGetter()[j][i].setter_Green(Green);
@@ -829,6 +831,7 @@ public:
                     int Green = image->GridGetter()[j][i].getter_Green();
                     int Blue = image->GridGetter()[j][i].getter_Blue();
 
+                    // Keeping Red only
                     Green = 0;
                     Blue = 0;
 
@@ -873,6 +876,8 @@ public:
                     int Red = image->GridGetter()[j][i].getter_Red();
                     int Green = image->GridGetter()[j][i].getter_Green();
                     int Blue = image->GridGetter()[j][i].getter_Blue();
+
+                    // Keeping Green only
 
                     Red = 0;
                     Blue = 0;
@@ -919,6 +924,8 @@ public:
                     int Green = image->GridGetter()[j][i].getter_Green();
                     int Blue = image->GridGetter()[j][i].getter_Blue();
 
+                    // Keeping Yellow only
+
                     Green = 0;
                     Red = 0;
 
@@ -952,12 +959,13 @@ public:
         name = "Box_Blur";
         ID = "08";
     }
+ 
     bool apply(Image *IImage)
     {
         if (avaliable == 1)
         {
             Image *image = new Image(*IImage);
-            int count = 1;
+            int count = 1; // to check how many of the cornors have been used 
             for (int i = 0; i < image->getter_height(); i++)
             {
                 for (int j = 0; j < image->getter_width(); j++)
@@ -966,9 +974,10 @@ public:
                     int Red = image->GridGetter()[i][j].getter_Red();
                     int Green = image->GridGetter()[i][j].getter_Green();
                     int Blue = image->GridGetter()[i][j].getter_Blue();
+                    // if cornor exists adding the values in initial values of R , G , B
                     if (((i + 1) < image->getter_height()) && ((i + 1) >= 0))
                     {
-                        Red = Red + image->GridGetter()[i + 1][j].getter_Red();
+                        Red = Red + image->GridGetter()[i + 1][j].getter_Red(); 
                         Blue = Blue + image->GridGetter()[i + 1][j].getter_Blue();
                         Green = Green + image->GridGetter()[i + 1][j].getter_Green();
                         count++;
@@ -1154,7 +1163,7 @@ class FilterSession
     string what_happened_helper_in_append;
 
 public:
-    void clear_pipeline()
+    void clear_pipeline() // remove all the filters from pipeline used after logout / every new load / applying pipeline
     {
         filters.clear();
         counter = 0;
@@ -1176,15 +1185,15 @@ public:
         counter = 0;
         what_happened_helper_in_append = "";
     }
-    FilterSession &add_filter(Filter *filter, bool &is_done)
+    FilterSession &add_filter(Filter *filter, bool &is_done) 
     {
         if (filter->is_avaliable() == 1)
         {
 
-            filters.push_back(filter);
+            filters.push_back(filter); // push every thing back by 1
             counter++;
-            is_done = 1;
-            return *this;
+            is_done = 1; // show filter has been applied as value would be retained in main
+            return *this; // for method chaining
         }
         else
         {
@@ -1202,7 +1211,7 @@ public:
         {
             if (filters.at(i)->is_avaliable())
             {
-                if (filters.at(i)->apply(image))
+                if (filters.at(i)->apply(image)) // would loop through all the filters stored in the vector
                 {
 
                     char choice = '\0';
@@ -1210,7 +1219,7 @@ public:
                     cout << filters.at(i)->name_getter() << " has been applied " << endl;
                     do
                     {
-                        cout << "Do you wish to preview the image in ascii in this state (Y/N): ";
+                        cout << "Do you wish to preview the image in ascii in this state (Y/N): "; // would allow you to display Ascii after each filter
                         cin >> choice;
                         if (choice != 'y' && choice != 'Y' && choice != 'n' && choice != 'N')
                         {
@@ -1241,7 +1250,7 @@ public:
     }
     bool save_result(string output_path, F_M_READ_WRITE &fm_R_W)
     {
-        return (image->save(output_path, fm_R_W));
+        return (image->save(output_path, fm_R_W)); // calls image save funtion which calls the write function of F_M_READ_WRITE
     }
     void display_ascii_preview()
     {
@@ -1254,9 +1263,9 @@ public:
 };
 class F_M_Customers;
 class Customer;
-class user
+class user  // Abstract class 
 {
-    friend class F_M_Customers;
+    friend class F_M_Customers; // using friend here so i could access name cnic etc in F_M_Customer
 
 protected:
     string name;
@@ -1287,6 +1296,25 @@ class Customer : public user
 
 public:
     friend class F_M_Customers;
+    string Gender_Getter()
+    {
+        string gender = "";
+
+        for (int i = 0; i < Gender.length(); i++) // Shifting the gender to small letters so it then could be used in main to disply Mr. Mrs. 
+        {
+            if (Gender[i] >= 65 && Gender[i] <= 90)
+            {
+                gender += (Gender[i] + 32);
+            }
+            else
+            {
+                gender += Gender[i];
+            }
+        }
+
+        return gender;
+    }
+
     string customer_name_getter()
     {
         return name;
@@ -1338,8 +1366,9 @@ public:
 class F_M_Customers
 {
 public:
-    void F_M_Display__All()
+    void F_M_Display__All() // loops through Customers.txt and display data
     {
+        int customer_count = 0;
         ifstream file_real("Customers.txt");
         if (!(file_real.is_open()))
         {
@@ -1353,7 +1382,7 @@ public:
             while (getline(file_real, data))
             {
                 int i = 0;
-
+                customer_count++;
                 string picked_password;
                 string picked_cnic;
                 string picked_name;
@@ -1406,9 +1435,13 @@ public:
                 cout << picked_cnic << "|" << picked_password << "|" << picked_name << "|" << picked_Gender << "|" << picked_phone << "|" << picked_city << "|" << picked_is_blocked << endl;
             }
             file_real.close();
+            if (customer_count == 0)
+            {
+                cout << "\033[33m" << "No customers available." << "\033[0m" << endl;
+            }
         }
     }
-    Customer *F_M_Load(string filemane, Customer *customer, string cnic, string password, bool &bloooocked)
+    Customer *F_M_Load(string filemane, Customer *customer, string cnic, string password, bool &bloooocked) // would be used for logging in an old customer
     {
         int cnic_size;
         int password_size;
@@ -1503,7 +1536,7 @@ public:
                     }
                     else
                     {
-                        cout << "\033[33m"<< "User has been blocked by the admin \n "<< "\033[0m";
+                        cout << "\033[33m" << "User has been blocked by the admin \n " << "\033[0m";
                         file.close();
                         bloooocked = 1;
                         return nullptr;
@@ -1516,7 +1549,7 @@ public:
     }
     int F_M_Save(Customer *customer)
     {
-        ofstream file("Customers.txt", ios::app);
+        ofstream file("Customers.txt", ios::app); // Appending to preserve the previous data 
         if (!file.is_open())
         {
             cout << "UNABLE TO OPEN THE FILE " << endl;
@@ -1530,7 +1563,7 @@ public:
         }
     }
 
-    int F_M_Customer_Counter()
+    int F_M_Customer_Counter() // would return count of total Customers 
     {
         ifstream file("Customers.txt");
         if (!file.is_open())
@@ -1550,7 +1583,7 @@ public:
             return counter;
         }
     }
-    int F_M_Delete(string cnic)
+    int F_M_Delete(string cnic) // Used to delete the user would match cnic make a temp file and then del the temp file
     {
         int count = F_M_Customer_Counter();
         ifstream file_real("Customers.txt");
@@ -1765,13 +1798,15 @@ public:
 
                     file_real2.close();
                     file_temp2.close();
+                    remove("Temp.txt"); // using remove
+                    remove("Temp2.txt"); // using remove
                     return 1;
                 }
             }
         }
         return 0;
     }
-    int F_M_Toogle(string cnic)
+    int F_M_Toogle(string cnic) // match cnic and the toggle block also add cnic on blocked page
     {
         ifstream file_real("Customers.txt");
         ofstream file_temp("Temp.txt");
@@ -1948,12 +1983,14 @@ public:
                 }
                 file_real.close();
                 file_temp.close();
+                remove("Temp.txt"); // removing temp files 
+                remove("Blocked_Cnics_temp.txt"); // removing temp files 
                 return 1;
             }
         }
         return 0;
     }
-    Customer *F_M_SEARCH_cnic(string cnic, Customer *customer)
+    Customer *F_M_SEARCH_cnic(string cnic, Customer *customer) // By cnic search would take cnic and display customer
     {
         int cnic_size;
         int password_size;
@@ -2056,7 +2093,7 @@ public:
         file.close();
         return nullptr;
     }
-    Customer *F_M_SEARCH_name(string name, Customer *customer)
+    Customer *F_M_SEARCH_name(string name, Customer *customer) // search by name 
     {
         int name_size;
 
@@ -2161,7 +2198,7 @@ public:
 class F_M_SESSIONS
 {
 public:
-    int F_M_Sessions_For_one_user(string cnic)
+    int F_M_Sessions_For_one_user(string cnic) // takes CNIC matches that with CNICs on the Sessions.txt page and boom
     {
         int count = 0;
         ifstream file("Sessions.txt");
@@ -2187,8 +2224,34 @@ public:
         file.close();
         return count;
     }
-    void F_M_LOAD_FOR_SPECIFIC_USER(string cnic)
+
+    int F_M_Sessions_For_all_user() // would display all the sessions
     {
+        int count = 0;
+        ifstream file("Sessions.txt");
+        if (!file.is_open())
+        {
+            cout << "\033[31m" << "Error: Could not open the file!" << "\033[0m" << endl;
+            return 0;
+        }
+        string data;
+        while (getline(file, data))
+        {
+            int i = 0;
+            string picked_cnic;
+            for (; data[i] != '\0' && data[i] != '|'; i++)
+            {
+                picked_cnic += data[i];
+            }
+
+            count++;
+        }
+        file.close();
+        return count;
+    }
+    void F_M_LOAD_FOR_SPECIFIC_USER(string cnic) 
+    {
+
         ifstream file_real2("Sessions.txt");
         // ofstream file_temp2("Temp2.txt");
         if (!(file_real2.is_open() /*&& file_temp2.is_open()*/))
@@ -2242,7 +2305,7 @@ public:
             }
         }
     }
-    int F_M_APPEND_SESSION(string cnic, string filterpipeline, string timestamp, string image_name)
+    int F_M_APPEND_SESSION(string cnic, string filterpipeline, string timestamp, string image_name) // Used to add a new session
     {
         ofstream file("Sessions.txt", ios::app);
         string data;
@@ -2258,7 +2321,7 @@ public:
             return 1;
         }
     }
-    int F_M_DELETE_SESSIONS_FOR_SPECIFIC_USER(string cnic)
+    int F_M_DELETE_SESSIONS_FOR_SPECIFIC_USER(string cnic) 
     {
         ifstream file_real2("Sessions.txt");
         ofstream file_temp2("Temp2.txt");
@@ -2330,6 +2393,7 @@ public:
 
                 file_real2.close();
                 file_temp2.close();
+                remove("Temp2.txt");
                 return 1;
             }
         }
@@ -2338,7 +2402,7 @@ public:
 class F_M_filter_catalog
 {
 public:
-    int F_M_TOGGLE_AVAILABILITY(string filter_id)
+    int F_M_TOGGLE_AVAILABILITY(string filter_id) // takes filter_id then matches it with it on page catalog.txt and then creat a temp on which changes the last from 1 to 0 and vice versa
     {
         ifstream file_real2("Catalog.txt");
         ofstream file_temp2("Temp3.txt");
@@ -2422,10 +2486,11 @@ public:
 
             file_real2.close();
             file_temp2.close();
+            remove("Temp3.txt");
             return 1;
         }
     }
-    int F_M_Load(bool *array, Filter *filters[])
+    int F_M_Load(bool *array, Filter *filters[]) // loads the filter array back up from the catalog.txt
     {
 
         ifstream file_real2("Catalog.txt");
@@ -2492,7 +2557,7 @@ public:
             return 1;
         }
     }
-    void display()
+    void display() // display currnent catalog for admin
     {
         ifstream file_real2("Catalog.txt");
 
@@ -2548,7 +2613,7 @@ public:
             file_real2.close();
         }
     }
-    void display_customer()
+    void display_customer() // display currnet catalog for user
     {
         ifstream file_real2("Catalog.txt");
 
@@ -2627,18 +2692,18 @@ public:
             return 0;
         }
     }
-    bool toggle_block(string cnic)
+    bool toggle_block(string cnic) // use F_M_Customer's toggle
     {
         F_M_Customers F_M_C;
 
         return (F_M_C.F_M_Toogle(cnic));
     }
-    bool toggle_filter(string filter_ID)
+    bool toggle_filter(string filter_ID) // uses F_M_filter_catalog's toggle
     {
         F_M_filter_catalog F_M_F_C;
         return (F_M_F_C.F_M_TOGGLE_AVAILABILITY(filter_ID));
     }
-    bool delete_account(string cnic)
+    bool delete_account(string cnic) // use delete fucntion of customer 
     {
         F_M_Customers F_M_C;
         return (F_M_C.F_M_Delete(cnic));
@@ -2699,11 +2764,22 @@ public:
     void view_sessions_single_user(string cnic)
     {
         F_M_SESSIONS F_M_S;
-        F_M_S.F_M_LOAD_FOR_SPECIFIC_USER(cnic);
+        if (F_M_S.F_M_Sessions_For_one_user(cnic) > 0)
+        {
+            cout << "Your Session History is as follows : " << endl;
+            F_M_S.F_M_LOAD_FOR_SPECIFIC_USER(cnic);
+        }
+        else
+        {
+            cout << "\033[33m" << "No sessions available For this user " << "\033[0m" << endl;
+            return;
+        }
     }
-    void Display_blocked()
+
+    void Display_blocked() // display data of all the blocked users
     {
         ifstream file_real("Customers.txt");
+        bool found = false;
 
         if (!(file_real.is_open()))
         {
@@ -2768,10 +2844,15 @@ public:
                 }
                 if (picked_is_blocked == 1)
                 {
+                    found = true;
                     cout << picked_cnic << "|" << picked_password << "|" << picked_name << "|" << picked_Gender << "|" << picked_phone << "|" << picked_city << "|" << picked_is_blocked << endl;
                 }
             }
             file_real.close();
+            if (!found)
+            {
+                cout << "\033[33m" << "No customers are blocked." << "\033[0m" << endl;
+            }
         }
     }
 };
@@ -2797,17 +2878,17 @@ public:
         int check2 = 0;
         int check3 = 0;
 
-        if (password.length() == 9)
+        if (password.length() == 9) // must be exactly 9 characters
         {
             check++;
         }
         for (int i = 0; password[i] != '\0'; i++)
         {
-            if ((password[i] >= 48) && (password[i] <= 57))
+            if ((password[i] >= 48) && (password[i] <= 57)) // must have a number
             {
                 check2++;
             }
-            else if ((password[i] >= 65) && (password[i] <= 90))
+            else if ((password[i] >= 65) && (password[i] <= 90)) // must have a capital
             {
                 check3++;
             }
@@ -2827,11 +2908,11 @@ public:
 
     int cnic_check(string cnic)
     {
-        if (cnic.length() != 13)
+        if (cnic.length() != 13) // must be 13 length
         {
             return -2;
         }
-        for (int i = 0; i < cnic.length(); i++)
+        for (int i = 0; i < cnic.length(); i++) // must be digits
         {
             if (cnic[i] < '0' || cnic[i] > '9')
                 return -2;
@@ -2900,13 +2981,13 @@ public:
                 {
                     picked_is_blocked = (data[i] == '1');
                 }
-                if (picked_cnic == cnic && picked_is_blocked == 0)
+                if (picked_cnic == cnic && picked_is_blocked == 0) // Already exist check 
                 {
                     file_real.close();
 
                     return 1; // found in cnic_general_list
                 }
-                else if (picked_cnic == cnic && picked_is_blocked == 1)
+                else if (picked_cnic == cnic && picked_is_blocked == 1) // Blocked check
                 {
                     file_real.close();
 
@@ -2924,7 +3005,7 @@ public:
         else
         {
             string data;
-            while (getline(file_blocked, data))
+            while (getline(file_blocked, data)) // check in blocked file 
             {
                 if (data == cnic)
                 {
@@ -2943,7 +3024,7 @@ string timestamp_maker()
     tm *ltm = localtime(&now);
 
     string timestamp = to_string(1900 + ltm->tm_year) + to_string(1 + ltm->tm_mon) + to_string(ltm->tm_mday) + "_" + to_string(ltm->tm_hour) + to_string(ltm->tm_min) + to_string(ltm->tm_sec);
-    return timestamp;
+    return timestamp; 
 }
 int main()
 {
@@ -3871,7 +3952,7 @@ mainmenu:
                 }
                 else if (choice4 == '2')
                 {
-                    cout << "BLOCKED CUSTOMERS ARE AS FOLLOWS : " << endl;
+                    cout << "BLOCKED CUSTOMERS : " << endl;
                     admin.Display_blocked();
                     char choice7;
                     do
@@ -4015,8 +4096,15 @@ mainmenu:
 
                 if (choice5 == '1')
                 {
-                    cout << "Following are all the sessions : " << endl;
-                    admin.view_sessions_All();
+                    if (F_M_S.F_M_Sessions_For_all_user() > 0)
+                    {
+                        cout << "Following are all the sessions : " << endl;
+                        admin.view_sessions_All();
+                    }
+                    else
+                    {
+                        cout << "\033[33m" << "No sessions available. " << "\033[0m" << endl;
+                    }
                     char choice7;
                     do
                     {
@@ -4041,7 +4129,7 @@ mainmenu:
                             cin >> choice8;
                             if (choice8 != 'y' && choice8 != 'Y' && choice8 != 'n' && choice8 != 'N')
                             {
-                                cout << "\033[33m" << "Invalid input. Please enter Y or N." << "\033[0m" << endl;
+                                cout << "\033[33m" <<    "Invalid input. Please enter Y or N." << "\033[0m" << endl;
                             }
                         } while (choice8 != 'y' && choice8 != 'Y' && choice8 != 'n' && choice8 != 'N');
 
@@ -4292,7 +4380,10 @@ mainmenu:
         }
         cout << endl;
 
-        cout << "|| " << left << setw(41) << (" WELCOME, " + customer.customer_name_getter()) << "||" << endl;
+        string title = (customer.Gender_Getter() == "male") ? "Mr. " : (customer.Gender_Getter() == "female") ? "Mrs. "
+                                                                                                              : "";
+        string welcome_line = " WELCOME, " + title + customer.customer_name_getter();
+        cout << "|| " << left << setw(41) << welcome_line << "||" << endl;
         cout << "|| " << left << setw(41) << (" Sessions completed : " + to_string(F_M_S.F_M_Sessions_For_one_user(customer.customer_CNIC_getter()))) << "||" << endl;
         for (int i = 0; i < 46; i++)
         {
@@ -4993,8 +5084,16 @@ mainmenu:
         }
         if (choice2 == '5')
         {
-            cout << "Your Session History is as follows : " << endl;
-            F_M_S.F_M_LOAD_FOR_SPECIFIC_USER(customer.customer_CNIC_getter());
+            if (F_M_S.F_M_Sessions_For_one_user(customer.customer_CNIC_getter()) > 0)
+            {
+                cout << "Your Session History is as follows : " << endl;
+                F_M_S.F_M_LOAD_FOR_SPECIFIC_USER(customer.customer_CNIC_getter());
+            }
+            else
+            {
+                cout << "\033[33m" << "No sessions available. \n Please Apply a filter at a loaded image to create history " << "\033[0m" << endl;
+                goto customer_menu; 
+            }
             char choice3;
             do
             {
@@ -5006,7 +5105,7 @@ mainmenu:
                 }
             } while (choice3 != 'y' && choice3 != 'Y' && choice3 != 'n' && choice3 != 'N');
             if (choice3 == 'y' || choice3 == 'Y')
-            {
+            {  
                 goto customer_menu;
             }
             else if (choice3 == 'n' || choice3 == 'N')
